@@ -2,8 +2,23 @@
 
 Final Project: SLA
 
-Under data/ directory: 
-   |-data_en_es
-   |-data_es_en
+Baseline: starter_code/baseline.py
+
+
+To train and predict:
+	python baseline.py --train ../data/data_es_en/es_en.slam.20171218.train --test ../data/data_es_en/es_en.slam.20171218.dev --pred prediction_es_en/es_en.slam.20171218.pred 
+
+To evaluate:
+	python eval.py --pred prediction_es_en/es_en.slam.20171218.pred --key ../data/data_es_en/es_en.slam.20171218.dev.key
+
+Output:
+	Metrics:	accuracy=0.848	avglogloss=0.378	auroc=0.752	F1=0.176
+
+You might want to load raw data/ directory (gitignored, requires local downloads). 
+
+
+|-data/
+   |-data_en_es/
+   |-data_es_en/
    |-data_fr_en
 
