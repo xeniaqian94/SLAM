@@ -1,0 +1,14 @@
+Xins-MacBook-Pro:SLAM xin$ python cli.py rnn assistments data/Assistant/skill_builder_data_corrected_big.csv --no-remove-skill-nans --drop-duplicates --item-id-col problem_id --num-iters 50 --dropout-prob 0.25 --first-learning-rate 5.0
+2018-02-21 02:34:06,153 [INFO] IRT.wrapper: Using IRT.assistments data with problem_id for item_id_col, None for template_id_col, and None for concept_id_col
+cli.py:116: DtypeWarning: Columns (17,29) have mixed types. Specify dtype option on import or set low_memory=False.
+  data, _, item_ids, _, _ = load_data(data_file, source, data_opts)
+2018-02-21 02:34:08,925 [INFO] IRT.assistments: Read 324,527 rows from file
+2018-02-21 02:34:09,526 [INFO] IRT.assistments: Removed 44,555 duplicate rows (279,972 rows remaining)
+2018-02-21 02:34:10,097 [INFO] IRT.assistments: Removed students with <2 interactions (279,875 rows remaining)
+2018-02-21 02:34:10,395 [INFO] IRT.assistments: concept_id_col not supplied, not using concepts
+2018-02-21 02:34:10,395 [INFO] IRT.assistments: template_id_col not supplied, not using templates
+2018-02-21 02:34:10,396 [INFO] IRT.assistments: Processed data: 279,875 interactions, 3,276 students; 25,960 items,   0 templates,   0 concepts
+2018-02-21 02:34:10,467 [INFO] IRT.wrapper: After removing students, 279,875/279,875 rows and 3,276/3,276 students remain
+(279875, 4)
+
+

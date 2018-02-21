@@ -2,8 +2,10 @@
 
 Final Project: SLA
 
+We use a deduplicated version of skill_builder_data_corrected.csv
+
 Under data/ directory: 
    |-data_en_es
    |-data_es_en
    |-data_fr_en
-
+   |-Assistant: Skill-builder data 2009-2010 https://sites.google.com/site/assistmentsdata/home/assistment-2009-2010-data/skill-builder-data-2009-2010

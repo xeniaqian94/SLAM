@@ -1,0 +1,19 @@
+# Data
+
+The ASSISTments deduplicated data set may be found [here](https://sites.google.com/site/assistmentsdata/home/assistment-2009-2010-data/skill-builder-data-2009-2010). Note that the authors of the data set have since removed several duplicates from the original data set which we used. However, as we explain in the paper, our preprocessing steps involved removing these duplicates as well. Thus, while we used the original data set, both the original and the corrected versions should duplicate our results.
+
+
+# Preparation
+
+1. Under python27 env, construct the 20/80 split data sets (20% for model parameter selection, e.g.,
+prior parameters, RNN layer sizes; 80% for train/test) using `IRT/split_data.py`,
+`python split_data.py ../data/Assistant/skill_builder_data_corrected.csv user_id ","`
+
+2. Run naive MLP
+
+python cli.py rnn assistments skill_builder_data_big.txt  \
+    --no-remove-skill-nans --drop-duplicates --num-folds 5 \
+    --item-id-col problem_id --num-iters 50 --dropout-prob 0.25 \
+    --first-learning-rate 5.0  --compress-dim 50 --hidden-dim 100
+
+
