@@ -4,6 +4,11 @@ Final Project: SLA
 
 We use a deduplicated version of skill_builder_data_corrected.csv
 
+On Assistment09 benchmark:
+
+    python ./cli.py mlp assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5 --item-id-col problem_id --num-iters 100 --first-learning-rate 0.001
+
+
 Baseline: starter_code/baseline.py
 
 
