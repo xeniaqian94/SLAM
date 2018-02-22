@@ -5,6 +5,8 @@ from __future__ import division
 
 import logging
 from collections import namedtuple
+from sklearn.metrics import *
+from sklearn.metrics import accuracy_score
 
 import numpy as np
 
@@ -78,9 +80,9 @@ def run(data_folds, num_folds, num_questions, num_iters, data_opts, output=None,
                                    mlp_opts, test_spacing, fold_num)
         mlps.append(mlp)
         results.append(mlp.results[-1])
-        if output:
-            with open(output + str(fold_num), 'wb') as f:
-                mlps.dump(f)  # dump multiple models
+        # if output:
+        #     with open(output + str(fold_num), 'wb') as f:
+        #         mlps.dump(f)  # dump multiple models
 
     LOGGER.info("Completed all %d folds", num_folds)
 
@@ -108,7 +110,8 @@ def build_mlp_data(train_data):
 
     # input(train_data.drop([CORRECT_KEY, USER_IDX_KEY,ITEM_IDX_KEY,TIME_IDX_KEY],axis=1))
     return (
-        train_data.drop([CORRECT_KEY, USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY], axis=1).as_matrix(), train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
+        train_data.drop([CORRECT_KEY, USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY], axis=1).as_matrix(),
+        train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
 
 
 import torch
@@ -142,7 +145,7 @@ class MLP:
 
         # Setup data
         self.train_data_X = train_data[0]
-        self.train_data_y = np.asarray(train_data[1],dtype=np.int32)
+        self.train_data_y = np.asarray(train_data[1], dtype=np.int32)
 
         self.test_data_X = test_data[0]
         self.test_data_y = test_data[1]
@@ -217,7 +220,6 @@ class MLP:
                 loss.backward()
                 self.optimizer.step()
 
-
             LOGGER.info("epoch %d training loss (over all batches) %.4f ", epoch, sum_loss)
             # testing
 
@@ -228,16 +230,25 @@ class MLP:
                 test_data_X = Variable(test_data_X, volatile=True)
                 test_data_pred = self.model(test_data_X)
                 test_data_pred = test_data_pred.data.numpy()
-                LOGGER.info(str(self.test_data_y[:20]))
-                LOGGER.info(str(test_data_pred[:20]))
 
-                test_acc = np.sum(test_data_pred[:, 1] >= 0.5)
+                # LOGGER.info(str(self.test_data_y[:20]))
+                # LOGGER.info(str(test_data_pred[:20]))
+
+                # test_acc = np.sum(test_data_pred[:, 1] >= test_data_pred[:, 0]) / test_data_pred.shape[0]
+                test_acc = accuracy_score(self.test_data_y[:, 1],
+                                          np.asarray((test_data_pred[:, 1] >= test_data_pred[:, 0]), dtype=int))
                 LOGGER.info("Prediction positive %.4f " % ((1.0 * np.sum(test_data_pred >= 0.5) / len(test_data_pred))))
-                test_auc = metrics.auc_helper(self.test_data_y == 1, test_data_pred)
+
+                input(self.test_data_y[:, 1].shape)
+                input(test_data_pred[:, 1])
+                fpr, tpr, thresholds = roc_curve(self.test_data_y[:, 1], test_data_pred[:, 1], pos_label=1)
+                test_auc = auc(fpr, tpr)
+
+                # test_auc = metrics.auc_helper(self.test_data_y[:, 1] == 1, test_data_pred[:, 1])
                 LOGGER.info("testing every %d accuracy %.4f auc %.4f ", test_spacing, test_acc, test_auc)
                 self.results.append(Results(accuracy=test_acc, auc=test_auc))
 
-        return test_acc, test_auc, test_data_pred, test_data_pred >= 0.5
+        return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 
 
 def eval_mlp(train_data, test_data, num_questions, data_opts, mlp_opts, test_spacing,

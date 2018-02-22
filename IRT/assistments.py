@@ -137,7 +137,7 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
 
 
     cols_to_keep+=["attempt_count","ms_first_response","opportunity","overlap_time"]
-    cols_to_normalize=["attempt_count","ms_first_response","opportunity","overlap_time"]
+    cols_to_normalize=["attempt_count","opportunity","overlap_time","ms_first_response"]
 
     for column in cols_to_normalize:
         data[column]=(data[column] - data[column].mean()) / data[column].std()
