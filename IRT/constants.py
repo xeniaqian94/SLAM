@@ -18,6 +18,9 @@ CONCEPT_IDX_KEY = 'concept_idx'
 # numbers in range(0, #users)
 USER_IDX_KEY = 'user_idx'
 
+# First column in original csv
+FIRST_COLUMN='order_id'
+
 # Represents a temporal ordering of items for the RNN. Can be any numeric
 # type as it's just used for sorting.
 TIME_IDX_KEY = 'time_idx'

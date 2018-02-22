@@ -5,7 +5,7 @@ import sys
 import numpy as np
 import pandas as pd
 
-# usage: python split_data.py ../data/Assistant/skill_builder_data_corrected.csv user_id ","
+# usage: under python27, python split_data.py ../data/Assistant/skill_builder_data_corrected.csv user_id ","
 
 def split_data(input_file, student_id, delimiter, seed=293, kept_percentage=0.8):
     """Split data rows based on student it and write splits to file.
@@ -20,7 +20,7 @@ def split_data(input_file, student_id, delimiter, seed=293, kept_percentage=0.8)
     # parse delimiter special characters
 
     delimiter = delimiter.encode('utf-8')
-    df = pd.read_csv(input_file, encoding='utf-8', delimiter=str(u',').encode('utf-8'), index_col=False, quotechar=str(u'"').encode('utf-8'))
+    df = pd.read_csv(input_file, encoding='utf-8', delimiter=str(delimiter).encode('utf-8'), index_col=False, quotechar=str(u'"').encode('utf-8'))
     user_ids = df[student_id].unique()
     np.random.seed(seed)
     np.random.shuffle(user_ids)

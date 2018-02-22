@@ -43,10 +43,10 @@ def build_nn_data(data, num_questions, use_correct=True, use_hints=False):
         y = []  # Mask Y to mask the probabilities all questions except the next one
         t = []  # The truth about the correctness of the next question
 
-        xiter, yiter = its.tee(user[ITEM_IDX_KEY].values)
+        xiter, yiter = its.tee(user[ITEM_IDX_KEY].values) #xiter=this question, yiter=next question
         next(yiter, None)
         this_correct_iter, next_correct_iter = its.tee(user[CORRECT_KEY].values)
-        next(next_correct_iter, None)
+        next(next_correct_iter, None)  # shift one timestamp ahead as the next_correct label
         if use_hints:
             hints_iter = user[HINT_COUNT_KEY].values
         else:

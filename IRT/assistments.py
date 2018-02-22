@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from IRT.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, CONCEPT_IDX_KEY, USER_IDX_KEY,
-                           TIME_IDX_KEY, CORRECT_KEY, SINGLE)
+                           TIME_IDX_KEY, CORRECT_KEY, SINGLE, FIRST_COLUMN)
 
 SKILL_ID_KEY = 'skill_id'
 PROBLEM_ID_KEY = 'problem_id'
@@ -47,10 +47,13 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
         concept ids corresponding to the concept indices
     :rtype: (pd.DataFrame, np.ndarray[int], np.ndarray[int], np.ndarray[int])
     """
-    data = pd.DataFrame.from_csv(file_path)
+    data = pd.read_csv(file_path, low_memory=False, index_col=FIRST_COLUMN)
     LOGGER.info("Read {:3,d} rows from file".format(len(data)))
 
     # Get the time index
+
+    LOGGER.info(
+        "Dataframe index key is " + str(data.index.name))  # dataframe index is the chronological order in the log
     data[TIME_IDX_KEY] = data.index.values
 
     # fix up skill ids
@@ -83,6 +86,7 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
     data = data.groupby(USER_ID_KEY).filter(lambda x: len(x) >= min_interactions_per_user)
     LOGGER.info("Removed students with <{} interactions ({:3,d} rows remaining)".format(
         min_interactions_per_user, len(data)))
+    LOGGER.info("maxInter" + str(max_interactions_per_user) + " mininter " + str(min_interactions_per_user))
 
     # limit to first `max_interactions_per_user`
     if max_interactions_per_user is not None:
@@ -123,13 +127,12 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
             raise ValueError('template_id_col %s not found', template_id_col)
         template_ids, data[TEMPLATE_IDX_KEY] = np.unique(data[template_id_col], return_inverse=True)
         cols_to_keep.append(TEMPLATE_IDX_KEY)
-
     LOGGER.info("Processed data: {:3,d} interactions, {:3,d} students; {:3,d} items, "
                 "{:3,d} templates, {:3,d} concepts"
                 .format(len(data), len(user_ids), len(item_ids),
                         len(template_ids) if template_ids is not None else 0,
-                        len(concept_ids) if concept_ids is not None else 0))
+                        len(concept_ids) if concept_ids is not None else 0) + " columns to keep: " + str(cols_to_keep))
+
+    # for MLP, cols_to_keep could also append attempt_count, ms_first_response, tutor_mode, answer_type, student_class_id, bottom_hint, opportunity
 
     return data[cols_to_keep], user_ids, item_ids, template_ids, concept_ids
-
-
