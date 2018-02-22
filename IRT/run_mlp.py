@@ -18,7 +18,7 @@ LOGGER = logging.getLogger(__name__)
 
 class MLPOpts(namedtuple('MLPOpts', ['hidden_dim', 'num_iters', 'first_learning_rate', 'batch_size'])):
 
-    def __new__(cls, hidden_dim=100, num_iters=100, first_learning_rate=0.01, batch_size=128):
+    def __new__(cls, hidden_dim=100, num_iters=100, first_learning_rate=0.001, batch_size=128):
         return super(MLPOpts, cls).__new__(cls, hidden_dim, num_iters, first_learning_rate, batch_size)
 
 
@@ -27,7 +27,7 @@ Results = namedtuple('Results', ['accuracy', 'auc'])
 
 def run(data_folds, num_folds, num_questions, num_iters, data_opts, output=None, compress_dim=100,
         hidden_dim=200, test_spacing=10, recurrent=True, dropout_prob=0.0,
-        output_compress_dim=None, first_learning_rate=30.0, decay_rate=0.99,
+        output_compress_dim=None, first_learning_rate=0.001, decay_rate=0.99,
         which_fold=None):
     """ Train and test the neural net
 
@@ -99,7 +99,16 @@ def build_mlp_data(train_data):
     """
         Build data ready for MLP input
     """
-    return (train_data.drop(CORRECT_KEY, axis=1).as_matrix(), train_data[CORRECT_KEY].as_matrix())
+    # input(train_data[CORRECT_KEY])
+    train_data_label = train_data[[CORRECT_KEY]]
+    train_data_label["in" + CORRECT_KEY] = 1 - train_data_label[CORRECT_KEY]
+    # input(train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
+
+    # return (train_data.drop(CORRECT_KEY, axis=1).as_matrix(), train_data[CORRECT_KEY].as_matrix())
+
+    # input(train_data.drop([CORRECT_KEY, USER_IDX_KEY,ITEM_IDX_KEY,TIME_IDX_KEY],axis=1))
+    return (
+        train_data.drop([CORRECT_KEY, USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY], axis=1).as_matrix(), train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
 
 
 import torch
@@ -123,7 +132,8 @@ class MLPNet(nn.Module):
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
-        return F.sigmoid(self.fc2(x))
+        # return F.sigmoid(self.fc2(x))
+        return F.softmax(self.fc2(x))
 
 
 class MLP:
@@ -132,14 +142,16 @@ class MLP:
 
         # Setup data
         self.train_data_X = train_data[0]
-        self.train_data_y = train_data[1]
+        self.train_data_y = np.asarray(train_data[1],dtype=np.int32)
+
         self.test_data_X = test_data[0]
         self.test_data_y = test_data[1]
         self.opts = opts
         self.data_opts = data_opts
-        self.model = MLPNet(self.train_data_X.shape[1], 1, opts.hidden_dim)  # binary classification
+        self.model = MLPNet(self.train_data_X.shape[1], 2, opts.hidden_dim)  # binary classification
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=opts.first_learning_rate)
-        self.loss = nn.BCELoss()  # binary cross entropy
+        # self.loss = nn.BCELoss()  # binary cross entropy
+        self.loss = nn.MSELoss()
         self.use_cuda = torch.cuda.is_available()
         self.results = []
         if self.use_cuda:
@@ -169,35 +181,58 @@ class MLP:
             for instance_id in range(0, self.train_data_X.shape[0], self.opts.batch_size)[:-1]:
                 train_data_X_batch = torch.from_numpy(self.train_data_X[
                                                       instance_id:min(instance_id + self.opts.batch_size,
-                                                                      len(self.train_data_X))]).float()
+                                                                      self.train_data_X.shape[0])]).float()
+
+                # input(train_data_X_batch)
+                # input(self.train_data_X.shape)
+                # input(self.train_data_X)
+                #
+                # input(self.train_data_y.shape)
+                # input(self.train_data_y.dtype)
                 train_data_y_batch = torch.from_numpy(self.train_data_y[
                                                       instance_id:min(instance_id + self.opts.batch_size,
-                                                                      len(self.train_data_y))])
+                                                                      self.train_data_y.shape[0])]).float()
+
+                # LOGGER.info("current batch positive "+str(1.0*np.sum(self.train_data_y[
+                #                                       instance_id:min(instance_id + self.opts.batch_size,
+                #                                                       len(self.train_data_y))]==1)/len(self.train_data_y[
+                #                                       instance_id:min(instance_id + self.opts.batch_size,
+                #                                                       len(self.train_data_y))])))
+
+                # input(train_data_y_batch)
                 if self.use_cuda:
                     train_data_X_batch, train_data_y_batch = train_data_X_batch.cuda(), train_data_y_batch.cuda()
 
                 self.optimizer.zero_grad()
 
-                train_data_X_batch, train_data_y_batch = Variable(train_data_X_batch), Variable(train_data_y_batch)
+                train_data_X_batch, train_data_y_batch = Variable(train_data_X_batch), Variable(train_data_y_batch,
+                                                                                                requires_grad=False)
+
+                # input("target "+str(train_data_y_batch.data))
                 train_data_pred_batch = self.model(train_data_X_batch)
+                # input("prediction "+str(train_data_pred_batch.data))
                 loss = self.loss(train_data_pred_batch, train_data_y_batch)
 
                 sum_loss += loss
                 loss.backward()
                 self.optimizer.step()
 
+
             LOGGER.info("epoch %d training loss (over all batches) %.4f ", epoch, sum_loss)
             # testing
 
             if (epoch % test_spacing == 0 and not epoch == 0):
-                test_data_X = torch.from_numpy(self.test_data_X)
+                test_data_X = torch.from_numpy(self.test_data_X).float()
                 if self.use_cuda:
                     test_data_X, test_data_y = test_data_X.cuda(), test_data_y.cuda()
                 test_data_X = Variable(test_data_X, volatile=True)
                 test_data_pred = self.model(test_data_X)
                 test_data_pred = test_data_pred.data.numpy()
+                LOGGER.info(str(self.test_data_y[:20]))
+                LOGGER.info(str(test_data_pred[:20]))
 
-                test_acc = np.sum(test_data_pred >= 0.5)
+                test_acc = np.sum(test_data_pred[:, 1] >= 0.5)
+                LOGGER.info("Prediction positive %.4f " % ((1.0 * np.sum(test_data_pred >= 0.5) / len(test_data_pred))))
                 test_auc = metrics.auc_helper(self.test_data_y == 1, test_data_pred)
                 LOGGER.info("testing every %d accuracy %.4f auc %.4f ", test_spacing, test_acc, test_auc)
                 self.results.append(Results(accuracy=test_acc, auc=test_auc))

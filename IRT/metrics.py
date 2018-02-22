@@ -29,7 +29,7 @@ def auc_helper(data, prob_true):
     if len(prob_true) != len(data):
         raise ValueError('prob_true and data must have the same length')
 
-    prob_true, data = Metrics._check_finite(prob_true, data)
+    # prob_true, data = Metrics._check_finite(prob_true, data)
     sorted_idx = np.argsort(prob_true)[::-1]
     sorted_prob_true = prob_true[sorted_idx]
     unique_prob_true_idx = np.append(np.flatnonzero(np.diff(sorted_prob_true)),

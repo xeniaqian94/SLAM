@@ -153,7 +153,7 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
                    "(i.e., no dropout)")
 @click.option('--use-hints/--no-use-hints', default=False,
               help="Should we add a one-hot dimension to represent whether a student used a hint?")
-@click.option('--first-learning-rate', nargs=1, default=30.0, type=float,
+@click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
               help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
 @click.option('--decay-rate', nargs=1, default=0.99, type=float,
               help="The rate at which the learning rate decays. Default is 0.99.")
@@ -178,6 +178,8 @@ def mlp(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
     # You might probably want to include more metadata features
 
     data, _, item_ids, _, _ = load_data(data_file, source, data_opts)
+
+    # normalize_by_columns
 
     num_questions = len(item_ids)
     data_folds = split_data(data, num_folds=common.num_folds, seed=common.seed)
