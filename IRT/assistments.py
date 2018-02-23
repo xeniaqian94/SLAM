@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 
 def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept_id_col=None,
               remove_nan_skill_ids=False, max_interactions_per_user=None,
-              drop_duplicates=False, min_interactions_per_user=2):
+              drop_duplicates=False, min_interactions_per_user=2, meta=False):
     """ Load the Assistments dataset as a pandas dataframe, filter out students with only a single
     interaction, and optionally truncate student histories.  The columns used for item and concept
     identifiers can be specified in the input arguments.
@@ -134,12 +134,20 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
                         len(concept_ids) if concept_ids is not None else 0) + " columns to keep: " + str(cols_to_keep))
 
     # for MLP, cols_to_keep could also append attempt_count, ms_first_response, tutor_mode, answer_type, student_class_id, bottom_hint, opportunity
+    if meta == True:
+        cols_to_keep += ["attempt_count", "ms_first_response", "opportunity", "overlap_time"]
+        cols_to_normalize = ["attempt_count", "opportunity", "overlap_time", "ms_first_response"]
 
+        for column in cols_to_normalize:
+            data[column] = (data[column] - data[column].mean()) / data[column].std()
 
-    cols_to_keep+=["attempt_count","ms_first_response","opportunity","overlap_time"]
-    cols_to_normalize=["attempt_count","opportunity","overlap_time","ms_first_response"]
+    if meta == False:
+        data[TIME_IDX_KEY] = (data[TIME_IDX_KEY] - data[TIME_IDX_KEY].mean()) / data[TIME_IDX_KEY].std()  # we are always able to eoncode time
 
-    for column in cols_to_normalize:
-        data[column]=(data[column] - data[column].mean()) / data[column].std()
+        # encode user_id and item_id as 0-N
+
+    # input("X columns" + str(cols_to_keep))
+    # input("user ids "+str(user_ids))
+    # input(data[cols_to_keep])
 
     return data[cols_to_keep], user_ids, item_ids, template_ids, concept_ids

@@ -106,7 +106,7 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
     SOURCE specifies the student data source, and should be 'assistments' or 'kddcup'.
     DATA_FILE is the filename for the interactions data.
     """
-    print("common.max_inter"+str(common.max_inter))
+    print("common.max_inter" + str(common.max_inter))
     data_opts = DataOpts(num_folds=common.num_folds, item_id_col=common.item_id_col,
                          concept_id_col=None, template_id_col=None, use_correct=use_correct,
                          remove_skill_nans=common.remove_skill_nans, seed=common.seed,
@@ -114,7 +114,7 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
                          drop_duplicates=common.drop_duplicates,
                          max_interactions_per_user=common.max_inter,
                          min_interactions_per_user=common.min_inter,
-                         proportion_students_retained=common.proportion_students_retained)
+                         proportion_students_retained=common.proportion_students_retained, meta=False)
 
     data, _, item_ids, _, _ = load_data(data_file, source, data_opts)
 
@@ -129,21 +129,13 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
     #             which_fold=common.which_fold)
 
 
-
-@cli.command('mlp')
+@cli.command('ncf')
 @click.argument('source')
 @click.argument('data_file')
-@click.option('--compress-dim', '-d', type=int, nargs=1, default=100,
-              help="The dimension to which to compress the input. If -1, will do no compression")
 @click.option('--hidden-dim', '-h', type=int, nargs=1, default=100,
               help="The number of hidden units in the RNN.")
-@click.option('--output-compress-dim', '-od', type=int, nargs=1, default=None,
-              help="The dimension to which we should compress the output vector. "
-                   "If not passed, no compression will occur.")
 @click.option('--test-spacing', '-t', type=int, nargs=1, default=10,
               help="How many iterations before running the tests?")
-@click.option('--recurrent/--no-recurrent', default=True,
-              help="Whether to use a recurrent architecture")
 @click.option('--use-correct/--no-use-correct', default=True,
               help="If True, record correct and incorrect responses as different input dimensions")
 @click.option('--num-iters', '-n', type=int, default=50,
@@ -155,17 +147,12 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
               help="Should we add a one-hot dimension to represent whether a student used a hint?")
 @click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
               help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
-@click.option('--decay-rate', nargs=1, default=0.99, type=float,
-              help="The rate at which the learning rate decays. Default is 0.99.")
 @common_options
-def mlp(common, source, data_file, compress_dim, hidden_dim, output_compress_dim, test_spacing,
-        recurrent, use_correct, num_iters, dropout_prob, use_hints, first_learning_rate,
-        decay_rate):
-    """ RNN based proficiency estimation.
-    SOURCE specifies the student data source, and should be 'assistments' or 'kddcup'.
-    DATA_FILE is the filename for the interactions data.
+def ncf(common, source, data_file, hidden_dim, test_spacing, use_correct, num_iters, dropout_prob, use_hints,
+        first_learning_rate):
     """
-    print("common.max_inter"+str(common.max_inter))
+    MLP based correctness prediction
+    """
     data_opts = DataOpts(num_folds=common.num_folds, item_id_col=common.item_id_col,
                          concept_id_col=None, template_id_col=None, use_correct=use_correct,
                          remove_skill_nans=common.remove_skill_nans, seed=common.seed,
@@ -173,24 +160,71 @@ def mlp(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
                          drop_duplicates=common.drop_duplicates,
                          max_interactions_per_user=common.max_inter,
                          min_interactions_per_user=common.min_inter,
-                         proportion_students_retained=common.proportion_students_retained)
+                         proportion_students_retained=common.proportion_students_retained, meta=False)
+
+    data, user_ids, item_ids, _, _ = load_data(data_file, source, data_opts)
+    # input("user ids "+str(user_ids)+" "+str(max(user_ids)))
+    # input("item ids "+str(item_ids)+" "+str(max(item_ids)))
+
+    # normalize_by_columns
+
+    num_questions = len(item_ids)
+    data_folds = split_data(data, num_folds=common.num_folds, seed=common.seed, by_interaction=True)
+
+    run_mlp.run(data_folds, common.num_folds, num_questions, num_iters,
+                hidden_dim=hidden_dim, test_spacing=test_spacing,
+                data_opts=data_opts,
+                first_learning_rate=first_learning_rate,
+                which_fold=common.which_fold, num_users=len(user_ids),user_ids=user_ids,item_ids=item_ids)
+
+
+@cli.command('mlp')
+@click.argument('source')
+@click.argument('data_file')
+@click.option('--hidden-dim', '-h', type=int, nargs=1, default=100,
+              help="The number of hidden units in the RNN.")
+@click.option('--test-spacing', '-t', type=int, nargs=1, default=10,
+              help="How many iterations before running the tests?")
+@click.option('--use-correct/--no-use-correct', default=True,
+              help="If True, record correct and incorrect responses as different input dimensions")
+@click.option('--num-iters', '-n', type=int, default=50,
+              help="How many iterations of training to perform on the RNN")
+@click.option('--dropout-prob', '-p', type=float, default=0.0,
+              help="The probability of a node being dropped during training. Default is 0.0 "
+                   "(i.e., no dropout)")
+@click.option('--use-hints/--no-use-hints', default=False,
+              help="Should we add a one-hot dimension to represent whether a student used a hint?")
+@click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
+              help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
+@common_options
+def mlp(common, source, data_file, hidden_dim, test_spacing, use_correct, num_iters, dropout_prob, use_hints,
+        first_learning_rate):
+    """
+    MLP based correctness prediction
+    """
+    data_opts = DataOpts(num_folds=common.num_folds, item_id_col=common.item_id_col,
+                         concept_id_col=None, template_id_col=None, use_correct=use_correct,
+                         remove_skill_nans=common.remove_skill_nans, seed=common.seed,
+                         use_hints=use_hints,
+                         drop_duplicates=common.drop_duplicates,
+                         max_interactions_per_user=common.max_inter,
+                         min_interactions_per_user=common.min_inter,
+                         proportion_students_retained=common.proportion_students_retained, meta=True)
 
     # You might probably want to include more metadata features
 
-    data, _, item_ids, _, _ = load_data(data_file, source, data_opts)
+    data, user_ids, item_ids, template_ids, concept_ids = load_data(data_file, source, data_opts)
 
     # normalize_by_columns
 
     num_questions = len(item_ids)
     data_folds = split_data(data, num_folds=common.num_folds, seed=common.seed)
 
-    run_mlp.run(data_folds, common.num_folds, num_questions, num_iters, output=common.output,
-                compress_dim=compress_dim, hidden_dim=hidden_dim, test_spacing=test_spacing,
-                recurrent=recurrent, data_opts=data_opts, dropout_prob=dropout_prob,
-                output_compress_dim=output_compress_dim,
-                first_learning_rate=first_learning_rate, decay_rate=decay_rate,
+    run_mlp.run(data_folds, common.num_folds, num_questions, num_iters,
+                hidden_dim=hidden_dim, test_spacing=test_spacing,
+                data_opts=data_opts,
+                first_learning_rate=first_learning_rate,
                 which_fold=common.which_fold)
-
 
 
 # @cli.command('irt')
@@ -241,9 +275,10 @@ def naive(common, source, data_file):
 
     agged = data.groupby(USER_IDX_KEY).correct.agg([np.sum, len]).reset_index()
     mask = agged['sum'] <= agged['len'] // 2
-    agged.loc[mask, 'sum'] = agged.loc[mask,'len'] - agged.loc[mask,'sum'] # agged.loc['len', mask] - agged.loc['sum', mask]
+    agged.loc[mask, 'sum'] = agged.loc[mask, 'len'] - agged.loc[
+        mask, 'sum']  # agged.loc['len', mask] - agged.loc['sum', mask]
     print("Percent correct for pseudo naive classifier is {}".format(agged['sum'].sum() /
-                                                              agged['len'].sum()))
+                                                                     agged['len'].sum()))
 
 
 def main():

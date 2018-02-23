@@ -27,10 +27,9 @@ class MLPOpts(namedtuple('MLPOpts', ['hidden_dim', 'num_iters', 'first_learning_
 Results = namedtuple('Results', ['accuracy', 'auc'])
 
 
-def run(data_folds, num_folds, num_questions, num_iters, data_opts, output=None, compress_dim=100,
-        hidden_dim=200, test_spacing=10, recurrent=True, dropout_prob=0.0,
-        output_compress_dim=None, first_learning_rate=0.001, decay_rate=0.99,
-        which_fold=None):
+def run(data_folds, num_folds, num_questions, num_iters, data_opts,
+        hidden_dim=200, test_spacing=10,
+        first_learning_rate=0.001, which_fold=None, num_users=None, user_ids=None, item_ids=None):
     """ Train and test the neural net
 
     :param iterable data_folds: an iterator over tuples of (train, test) datasets
@@ -62,8 +61,6 @@ def run(data_folds, num_folds, num_questions, num_iters, data_opts, output=None,
                              "and num_folds({num_folds})".format(which_fold=which_fold,
                                                                  num_folds=num_folds))
 
-    compress_dim = None if compress_dim <= 0 else compress_dim
-
     mlps = []
     results = []
     mlp_opts = MLPOpts(hidden_dim=hidden_dim, num_iters=num_iters, first_learning_rate=first_learning_rate)
@@ -71,13 +68,17 @@ def run(data_folds, num_folds, num_questions, num_iters, data_opts, output=None,
 
     for fold_num, (train_data, test_data) in enumerate(data_folds):
 
+        LOGGER.info("this fold has " + str(len(test_data[TIME_IDX_KEY].unique())) + " interactions and students " + str(
+            len(test_data[USER_IDX_KEY].unique())))
+
         fold_num += 1
         if which_fold and fold_num != which_fold:
             continue
 
         LOGGER.info("Beginning fold %d", fold_num)
-        _, _, _, _, mlp = eval_mlp(train_data, test_data, num_questions, data_opts,
-                                   mlp_opts, test_spacing, fold_num)
+        _, _, _, _, mlp = eval(train_data, test_data, num_questions, data_opts,
+                               mlp_opts, test_spacing, fold_num, num_users, user_ids, item_ids)
+
         mlps.append(mlp)
         results.append(mlp.results[-1])
         # if output:
@@ -103,7 +104,7 @@ def build_mlp_data(train_data):
     """
     # input(train_data[CORRECT_KEY])
     train_data_label = train_data[[CORRECT_KEY]]
-    train_data_label["in" + CORRECT_KEY] = 1 - train_data_label[CORRECT_KEY]
+    train_data_label.loc[:, "in" + CORRECT_KEY] = 1 - train_data_label.loc[:, CORRECT_KEY]
     # input(train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
 
     # return (train_data.drop(CORRECT_KEY, axis=1).as_matrix(), train_data[CORRECT_KEY].as_matrix())
@@ -111,6 +112,24 @@ def build_mlp_data(train_data):
     # input(train_data.drop([CORRECT_KEY, USER_IDX_KEY,ITEM_IDX_KEY,TIME_IDX_KEY],axis=1))
     return (
         train_data.drop([CORRECT_KEY, USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY], axis=1).as_matrix(),
+        train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
+
+
+def build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids):
+    """
+            Build data ready for NCF input
+    """
+
+    train_data_label = train_data[[CORRECT_KEY]]
+    train_data_label.loc[:, "in" + CORRECT_KEY] = 1 - train_data_label.loc[:, CORRECT_KEY]
+    a = train_data[USER_IDX_KEY].unique()
+    b = train_data[ITEM_IDX_KEY].unique()
+    # input("user id onehot encode? three numbers hould be the same "+str(max(a))+" "+str(num_users)+" "+str(len(user_ids)))
+    # input("3 same "+" "+str(max(b))+" "+str(num_questions)+" "+str(len(item_ids)))
+    # input(train_data[[USER_IDX_KEY,ITEM_IDX_KEY,TIME_IDX_KEY]].as_matrix())
+
+    return (
+        train_data[[USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY]].as_matrix(),
         train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
 
 
@@ -126,9 +145,9 @@ def unison_shuffled_copies(a, b):
     return a[p], b[p]
 
 
-class MLPNet(nn.Module):
+class MLP(nn.Module):
     def __init__(self, num_input, num_output, hiddem_dim):
-        super(MLPNet, self).__init__()
+        super(MLP, self).__init__()
         self.fc1 = nn.Linear(num_input, hiddem_dim)
         self.fc2 = nn.Linear(hiddem_dim, num_output)
         LOGGER.info("MLP input_dim %d hidden_num %d output_dim %d", num_input, hiddem_dim, num_output)
@@ -136,12 +155,39 @@ class MLPNet(nn.Module):
     def forward(self, x):
         x = F.relu(self.fc1(x))
         # return F.sigmoid(self.fc2(x))
-        return F.softmax(self.fc2(x))
+        return F.softmax(self.fc2(x),dim=1)
 
 
-class MLP:
+class NCF(nn.Module):
+    def __init__(self, num_input, num_output, hiddem_dim, num_users, num_questions,emb_size):
+        super(NCF, self).__init__()
 
-    def __init__(self, train_data, opts, test_data=None, data_opts=None):
+        self.user_embedding = nn.Embedding(num_users, emb_size)
+        self.item_embedding = nn.Embedding(num_questions, emb_size)
+        self.fc1 = nn.Linear(2*emb_size+1, hiddem_dim)
+        self.fc2 = nn.Linear(hiddem_dim, num_output)
+        LOGGER.info("NCF input_dim=2*emb_size %d hidden_num %d output_dim %d", 2*emb_size, hiddem_dim, num_output)
+
+    def forward(self, words):
+        user_emb = self.user_embedding(words[:,0].long())  # 2D Tensor of size [batch_size x emb_size]
+        item_emb=self.item_embedding(words[:,1].long())
+        # input("user emb shape "+str(user_emb.shape)+" "+str(type(user_emb))+" is float Tensor?")
+        # input("item emb shape "+str(item_emb.shape))
+        batch_size=words.shape[0]
+        # input(batch_size)
+        # input("timestamp feat shape "+str(words[:,2].contiguous().view(batch_size,1).shape))
+        x=torch.cat([user_emb,item_emb,words[:,2].contiguous().view(batch_size,1)],dim=1)
+        # input("concatenated user item embedding + timestamp shape "+str(x.shape)+" type "+str(type(x.data)))
+        x = F.relu(self.fc1(x))
+        return F.softmax(self.fc2(x),dim=1)
+
+
+
+class ModelExecuter:
+
+    def __init__(self, train_data, opts, test_data=None, data_opts=None, num_users=None, num_questions=None):
+
+        use_mlp = (num_users == None) and (num_questions == None)
 
         # Setup data
         self.train_data_X = train_data[0]
@@ -151,7 +197,10 @@ class MLP:
         self.test_data_y = test_data[1]
         self.opts = opts
         self.data_opts = data_opts
-        self.model = MLPNet(self.train_data_X.shape[1], 2, opts.hidden_dim)  # binary classification
+        if use_mlp:
+            self.model = MLP(self.train_data_X.shape[1], 2, opts.hidden_dim)  # binary classification
+        else:
+            self.model = NCF(self.train_data_X.shape[1], 2, opts.hidden_dim, num_users, num_questions,200)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=opts.first_learning_rate)
         # self.loss = nn.BCELoss()  # binary cross entropy
         self.loss = nn.MSELoss()
@@ -176,6 +225,7 @@ class MLP:
         """
 
         for epoch in np.arange(num_iters):
+            LOGGER.info("Epoch "+str(epoch)+" starts! ")
             self.train_data_X, self.train_data_y = unison_shuffled_copies(self.train_data_X, self.train_data_y)
 
             # training
@@ -239,8 +289,8 @@ class MLP:
                                           np.asarray((test_data_pred[:, 1] >= test_data_pred[:, 0]), dtype=int))
                 LOGGER.info("Prediction positive %.4f " % ((1.0 * np.sum(test_data_pred >= 0.5) / len(test_data_pred))))
 
-                input(self.test_data_y[:, 1].shape)
-                input(test_data_pred[:, 1])
+                # input(self.test_data_y[:, 1].shape)
+                # input(test_data_pred[:, 1])
                 fpr, tpr, thresholds = roc_curve(self.test_data_y[:, 1], test_data_pred[:, 1], pos_label=1)
                 test_auc = auc(fpr, tpr)
 
@@ -251,8 +301,8 @@ class MLP:
         return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 
 
-def eval_mlp(train_data, test_data, num_questions, data_opts, mlp_opts, test_spacing,
-             fold_num):
+def eval(train_data, test_data, num_questions, data_opts, mlp_opts, test_spacing,
+         fold_num, num_users, user_ids, item_ids):
     """ Create, train, and cross-validate an RNN on a train/test split.
 
     :param pd.DataFrame train_data: training data
@@ -266,15 +316,25 @@ def eval_mlp(train_data, test_data, num_questions, data_opts, mlp_opts, test_spa
     :rtype: MLP
     """
     LOGGER.info("Training RNN, fold %d, train length %d, test length %d", fold_num, len(train_data), len(test_data))
+    LOGGER.info("num_questions=26684? " + str(num_questions) + " num_users=4097? " + str(num_users))
+    if data_opts.meta:
+        train_mlp_data = build_mlp_data(train_data)
+        test_mlp_data = build_mlp_data(test_data)
 
-    train_mlp_data = build_mlp_data(train_data)
-    test_mlp_data = build_mlp_data(test_data)
+        mlp = ModelExecuter(train_mlp_data, mlp_opts, test_data=test_mlp_data,
+                            data_opts=data_opts)  # initialize the model
+        test_acc, test_auc, test_prob_correct, test_corrects = mlp.train_and_test(
+            mlp_opts.num_iters,
+            test_spacing=test_spacing)  # AUC score for the case is 0.5. A score for a perfect classifier would be 1.
+    else:
+        # input("user id example " + str(user_ids[5]) + " item_ids example " + str(item_ids[5])) # original id value
+        train_ncf_data = build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids)
+        test_ncf_data = build_ncf_data(test_data, num_users, num_questions, user_ids, item_ids)
+        ncf = ModelExecuter(train_ncf_data, mlp_opts, test_data=test_ncf_data, data_opts=data_opts, num_users=num_users, num_questions=num_questions)  # initialize the model
+        test_acc, test_auc, test_prob_correct, test_corrects = ncf.train_and_test(
+            mlp_opts.num_iters,
+            test_spacing=test_spacing)  # AUC score for the case is 0.5. A score for a perfect classifier would be 1.
 
-    mlp = MLP(train_mlp_data, mlp_opts, test_data=test_mlp_data, data_opts=data_opts)  # initialize the model
-
-    test_acc, test_auc, test_prob_correct, test_corrects = mlp.train_and_test(
-        mlp_opts.num_iters,
-        test_spacing=test_spacing)  # AUC score for the case is 0.5. A score for a perfect classifier would be 1.
     LOGGER.info("Fold %d: Num Interactions: %d; Test Accuracy: %.5f; Test AUC: %.5f",
                 fold_num, len(test_data), test_acc, test_auc)
 

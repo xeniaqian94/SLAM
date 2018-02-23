@@ -4,7 +4,7 @@ Utilities for general data pre-processing.
 import logging
 import numpy as np
 
-from .constants import USER_IDX_KEY
+from .constants import USER_IDX_KEY,TIME_IDX_KEY
 
 _logger = logging.getLogger(__name__)
 
@@ -28,8 +28,27 @@ def _get_fold_student_idx(student_ids, num_folds, seed=0):
     return [student_ids[fold_idx[i * fold_size:min(num_students, (i + 1) * fold_size)]]
             for i in range(num_folds)]
 
+def _get_fold_interaction_idx(order_ids, num_folds, seed=0):
+    """ Split up unique student IDs into different folds.
 
-def split_data(data, num_folds, seed=0):
+    :param np.ndarray student_ids: set of unique student ids or indices
+    :param int num_folds: number of folds to split that data into
+    :param int seed: seed for the splitting
+    :return: student ids per fold
+    :rtype: list
+    """
+    num_interactions = len(order_ids)
+    fold_idx = np.arange(num_interactions)
+    # randomize the order of all students to be split across folds
+    np.random.seed(seed)
+    np.random.shuffle(fold_idx)
+    fold_size = num_interactions // num_folds
+
+    return [order_ids[fold_idx[i * fold_size:min(num_interactions, (i + 1) * fold_size)]]
+            for i in range(num_folds)]
+
+
+def split_data(data, num_folds, seed=0, by_interaction=False):
     """ Split all interactions into K-fold sets of training and test dataframes.  Splitting is done
     by assigning student ids to the training or test sets.
 
@@ -39,11 +58,23 @@ def split_data(data, num_folds, seed=0):
     :return: a generator over (train dataframe, test dataframe) tuples
     :rtype: generator[(pd.DataFrame, pd.DataFrame)]
     """
-    # break up students into folds
-    fold_student_idx = _get_fold_student_idx(np.unique(data[USER_IDX_KEY]), num_folds=num_folds,
-                                             seed=seed)
 
-    for fold_test_student_idx in fold_student_idx:
-        test_idx = np.in1d(data[USER_IDX_KEY], fold_test_student_idx)
-        train_idx = np.logical_not(test_idx)
-        yield (data[train_idx].copy(), data[test_idx].copy())
+
+
+    if (not by_interaction):   # split by user, for testing, each fold has 65419 interactions and students 819(1/5)
+        # break up students into folds
+        fold_student_idx = _get_fold_student_idx(np.unique(data[USER_IDX_KEY]), num_folds=num_folds,
+                                                 seed=seed)
+
+        for fold_test_student_idx in fold_student_idx:
+            test_idx = np.in1d(data[USER_IDX_KEY], fold_test_student_idx)
+            train_idx = np.logical_not(test_idx)
+            yield (data[train_idx].copy(), data[test_idx].copy())
+    else: # for ncf, split by interactions, for testing, each fold has has 69348(1/5) interactions and students 3723
+        fold_interaction_idx = _get_fold_interaction_idx(np.unique(data[TIME_IDX_KEY]), num_folds=num_folds,
+                                                 seed=seed)
+
+        for fold_test_interaction_idx in fold_interaction_idx:
+            test_idx = np.in1d(data[TIME_IDX_KEY], fold_test_interaction_idx)
+            train_idx = np.logical_not(test_idx)
+            yield (data[train_idx].copy(), data[test_idx].copy())
