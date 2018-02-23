@@ -155,32 +155,31 @@ class MLP(nn.Module):
     def forward(self, x):
         x = F.relu(self.fc1(x))
         # return F.sigmoid(self.fc2(x))
-        return F.softmax(self.fc2(x),dim=1)
+        return F.softmax(self.fc2(x), dim=1)
 
 
 class NCF(nn.Module):
-    def __init__(self, num_input, num_output, hiddem_dim, num_users, num_questions,emb_size):
+    def __init__(self, num_input, num_output, hiddem_dim, num_users, num_questions, emb_size):
         super(NCF, self).__init__()
 
         self.user_embedding = nn.Embedding(num_users, emb_size)
         self.item_embedding = nn.Embedding(num_questions, emb_size)
-        self.fc1 = nn.Linear(2*emb_size+1, hiddem_dim)
+        self.fc1 = nn.Linear(2 * emb_size + 1, hiddem_dim)
         self.fc2 = nn.Linear(hiddem_dim, num_output)
-        LOGGER.info("NCF input_dim=2*emb_size %d hidden_num %d output_dim %d", 2*emb_size, hiddem_dim, num_output)
+        LOGGER.info("NCF input_dim=2*emb_size %d hidden_num %d output_dim %d", 2 * emb_size, hiddem_dim, num_output)
 
     def forward(self, words):
-        user_emb = self.user_embedding(words[:,0].long())  # 2D Tensor of size [batch_size x emb_size]
-        item_emb=self.item_embedding(words[:,1].long())
+        user_emb = self.user_embedding(words[:, 0].long())  # 2D Tensor of size [batch_size x emb_size]
+        item_emb = self.item_embedding(words[:, 1].long())
         # input("user emb shape "+str(user_emb.shape)+" "+str(type(user_emb))+" is float Tensor?")
         # input("item emb shape "+str(item_emb.shape))
-        batch_size=words.shape[0]
+        batch_size = words.shape[0]
         # input(batch_size)
         # input("timestamp feat shape "+str(words[:,2].contiguous().view(batch_size,1).shape))
-        x=torch.cat([user_emb,item_emb,words[:,2].contiguous().view(batch_size,1)],dim=1)
+        x = torch.cat([user_emb, item_emb, words[:, 2].contiguous().view(batch_size, 1)], dim=1)
         # input("concatenated user item embedding + timestamp shape "+str(x.shape)+" type "+str(type(x.data)))
         x = F.relu(self.fc1(x))
-        return F.softmax(self.fc2(x),dim=1)
-
+        return F.softmax(self.fc2(x), dim=1)
 
 
 class ModelExecuter:
@@ -200,7 +199,7 @@ class ModelExecuter:
         if use_mlp:
             self.model = MLP(self.train_data_X.shape[1], 2, opts.hidden_dim)  # binary classification
         else:
-            self.model = NCF(self.train_data_X.shape[1], 2, opts.hidden_dim, num_users, num_questions,200)
+            self.model = NCF(self.train_data_X.shape[1], 2, opts.hidden_dim, num_users, num_questions, 200)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=opts.first_learning_rate)
         # self.loss = nn.BCELoss()  # binary cross entropy
         self.loss = nn.MSELoss()
@@ -225,7 +224,7 @@ class ModelExecuter:
         """
 
         for epoch in np.arange(num_iters):
-            LOGGER.info("Epoch "+str(epoch)+" starts! ")
+            LOGGER.info("Epoch " + str(epoch) + " starts! ")
             self.train_data_X, self.train_data_y = unison_shuffled_copies(self.train_data_X, self.train_data_y)
 
             # training
@@ -276,7 +275,7 @@ class ModelExecuter:
             if (epoch % test_spacing == 0 and not epoch == 0):
                 test_data_X = torch.from_numpy(self.test_data_X).float()
                 if self.use_cuda:
-                    test_data_X, test_data_y = test_data_X.cuda(), test_data_y.cuda()
+                    test_data_X = test_data_X.cuda()
                 test_data_X = Variable(test_data_X, volatile=True)
                 test_data_pred = self.model(test_data_X)
                 test_data_pred = test_data_pred.data.numpy()
@@ -330,7 +329,8 @@ def eval(train_data, test_data, num_questions, data_opts, mlp_opts, test_spacing
         # input("user id example " + str(user_ids[5]) + " item_ids example " + str(item_ids[5])) # original id value
         train_ncf_data = build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids)
         test_ncf_data = build_ncf_data(test_data, num_users, num_questions, user_ids, item_ids)
-        ncf = ModelExecuter(train_ncf_data, mlp_opts, test_data=test_ncf_data, data_opts=data_opts, num_users=num_users, num_questions=num_questions)  # initialize the model
+        ncf = ModelExecuter(train_ncf_data, mlp_opts, test_data=test_ncf_data, data_opts=data_opts, num_users=num_users,
+                            num_questions=num_questions)  # initialize the model
         test_acc, test_auc, test_prob_correct, test_corrects = ncf.train_and_test(
             mlp_opts.num_iters,
             test_spacing=test_spacing)  # AUC score for the case is 0.5. A score for a perfect classifier would be 1.
