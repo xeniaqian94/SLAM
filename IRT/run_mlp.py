@@ -166,7 +166,7 @@ class NCF(nn.Module):
         self.item_embedding = nn.Embedding(num_questions, emb_size)
         self.fc1 = nn.Linear(2 * emb_size + 1, hiddem_dim)
         self.fc2 = nn.Linear(hiddem_dim, num_output)
-        LOGGER.info("NCF input_dim=2*emb_size %d hidden_num %d output_dim %d", 2 * emb_size, hiddem_dim, num_output)
+        LOGGER.info("NCF input_dim=2*emb_size+1(timestamp) %d hidden_num %d output_dim %d", 2 * emb_size+1, hiddem_dim, num_output)
 
     def forward(self, words):
         user_emb = self.user_embedding(words[:, 0].long())  # 2D Tensor of size [batch_size x emb_size]
@@ -277,8 +277,10 @@ class ModelExecuter:
                 if self.use_cuda:
                     test_data_X = test_data_X.cuda()
                 test_data_X = Variable(test_data_X, volatile=True)
-                test_data_pred = self.model(test_data_X)
-                test_data_pred = test_data_pred.data.numpy()
+                test_data_pred = self.model(test_data_X).data
+                if self.use_cuda:
+                    test_data_pred=test_data_pred.cpu()
+                test_data_pred = test_data_pred.numpy()
 
                 # LOGGER.info(str(self.test_data_y[:20]))
                 # LOGGER.info(str(test_data_pred[:20]))
