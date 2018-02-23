@@ -322,22 +322,20 @@ def eval(train_data, test_data, num_questions, data_opts, mlp_opts, test_spacing
         train_mlp_data = build_mlp_data(train_data)
         test_mlp_data = build_mlp_data(test_data)
 
-        mlp = ModelExecuter(train_mlp_data, mlp_opts, test_data=test_mlp_data,
+        model = ModelExecuter(train_mlp_data, mlp_opts, test_data=test_mlp_data,
                             data_opts=data_opts)  # initialize the model
-        test_acc, test_auc, test_prob_correct, test_corrects = mlp.train_and_test(
-            mlp_opts.num_iters,
-            test_spacing=test_spacing)  # AUC score for the case is 0.5. A score for a perfect classifier would be 1.
     else:
         # input("user id example " + str(user_ids[5]) + " item_ids example " + str(item_ids[5])) # original id value
         train_ncf_data = build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids)
         test_ncf_data = build_ncf_data(test_data, num_users, num_questions, user_ids, item_ids)
-        ncf = ModelExecuter(train_ncf_data, mlp_opts, test_data=test_ncf_data, data_opts=data_opts, num_users=num_users,
+        model = ModelExecuter(train_ncf_data, mlp_opts, test_data=test_ncf_data, data_opts=data_opts, num_users=num_users,
                             num_questions=num_questions)  # initialize the model
-        test_acc, test_auc, test_prob_correct, test_corrects = ncf.train_and_test(
-            mlp_opts.num_iters,
-            test_spacing=test_spacing)  # AUC score for the case is 0.5. A score for a perfect classifier would be 1.
+
+    test_acc, test_auc, test_prob_correct, test_corrects = model.train_and_test(
+        mlp_opts.num_iters,
+        test_spacing=test_spacing)  # AUC score for the case is 0.5. A score for a perfect classifier would be 1.
 
     LOGGER.info("Fold %d: Num Interactions: %d; Test Accuracy: %.5f; Test AUC: %.5f",
                 fold_num, len(test_data), test_acc, test_auc)
 
-    return test_acc, test_auc, test_prob_correct, test_corrects, mlp
+    return test_acc, test_auc, test_prob_correct, test_corrects, model
