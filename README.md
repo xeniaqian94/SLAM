@@ -5,13 +5,13 @@
 
 You might want to load raw data/ directory (gitignored, requires local downloads).
 
-|-data/
-   |-data_en_es/
-   |-data_es_en/
-   |-data_fr_en
-   |-Assistant: Skill-builder data 2009-2010 https://sites.google.com/site/assistmentsdata/home/assistment-2009-2010-data/skill-builder-data-2009-2010
+	|-data/
+   		|-data_en_es/
+   		|-data_es_en/
+   		|-data_fr_en
+   		|-Assistant/
 
-We use a deduplicated version of skill_builder_data_corrected.csv
+We use a deduplicated version of `skill_builder_data_corrected.csv` from Skill-builder data 2009-2010 https://sites.google.com/site/assistmentsdata/home/assistment-2009-2010-data/skill-builder-data-2009-2010
 
 
 ## Command
