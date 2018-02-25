@@ -1,6 +1,6 @@
-## 11-747 Neural Network for NLP, Second Language Acquisition Modeling
+# 11-747 Neural Network for NLP, Second Language Acquisition Modeling
 
-# Dataset
+## Dataset
 
 You might want to load raw data/ directory (gitignored, requires local downloads).
 
@@ -13,7 +13,7 @@ You might want to load raw data/ directory (gitignored, requires local downloads
 We use a deduplicated version of skill_builder_data_corrected.csv
 
 
-# Command
+## Command
 On Assistment09 benchmark:
 
     python ./cli.py ncf assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5 --item-id-col problem_id --num-iters 50 --first-learning-rate 0.001  --embedding_dim 210 --hidden-dim 256
