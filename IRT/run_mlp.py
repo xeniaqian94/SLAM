@@ -224,7 +224,7 @@ class ModelExecuter:
             LOGGER.info("Cuda detected, using cuda")
         self.prediction_output = None
         if data_opts.prediction_output != None:
-            self.prediction_output = opts.prediction_output
+            self.prediction_output = data_opts.prediction_output
             LOGGER.info("Prediction output path " + self.prediction_output)
 
     def train_and_test(self, num_iters, test_spacing=5):
