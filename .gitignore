@@ -1,2 +1,8 @@
-data/*
+data/data_en_es/*
+data/data_es_en/*
+data/data_fr_en/*
+data/ptb/*
 archive/*
+.ipynb_checkpoints/*
+.idea/*
+IRT/__pycache__/*
