@@ -225,7 +225,8 @@ class ModelExecuter:
         self.prediction_output = None
         if data_opts.prediction_output != None:
             self.prediction_output = data_opts.prediction_output
-            LOGGER.info("Prediction output path " + self.prediction_output)
+            os.remove(data_opts.prediction_output)
+            LOGGER.info("Prediction output path " + self.prediction_output+" (removing existing one)!")
 
     def train_and_test(self, num_iters, test_spacing=5):
         """
