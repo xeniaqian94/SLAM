@@ -318,16 +318,17 @@ class ModelExecuter:
                 LOGGER.info("testing every %d accuracy %.4f auc %.4f ", test_spacing, test_acc, test_auc)
                 self.results.append(Results(accuracy=test_acc, auc=test_auc))
 
-        df=pd.DataFrame()
-        df[ORDER_ID]=self.test_data_order_ids
-        df[USER_ID_KEY]=self.test_data_user_ids
-        df[ITEM_ID_KEY]=self.test_data_item_ids
-        df[CORRECT_KEY]=self.test_data_y[:,1]
-        df["prediction"]=test_data_pred[:,1]
+        df = pd.DataFrame()
+        df[USER_ID_KEY] = self.test_data_user_ids
+        df[ITEM_ID_KEY] = self.test_data_item_ids
+        df[CORRECT_KEY] = self.test_data_y[:, 1]
+        df["prediction"] = test_data_pred[:, 1]
 
-        if os._exists(self.prediction_output):
+        if os.path.exists(self.prediction_output):
             with open(self.prediction_output, 'a') as f:
-                LOGGER.info("Appending this fold prediction to "+self.prediction_output+" number of interactions "+str(len(test_data_pred[:,1])))
+                LOGGER.info(
+                    "Appending this fold prediction to " + self.prediction_output + " number of interactions " + str(
+                        len(test_data_pred[:, 1])))
                 df.to_csv(f, header=False)
         else:
             with open(self.prediction_output, 'w') as f:
