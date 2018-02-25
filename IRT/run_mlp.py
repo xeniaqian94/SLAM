@@ -222,7 +222,8 @@ class ModelExecuter:
         if self.use_cuda:
             self.model = self.model.cuda()
             LOGGER.info("Cuda detected, using cuda")
-        if opts.prediction_output != None:
+        self.prediction_output = None
+        if data_opts.prediction_output != None:
             self.prediction_output = opts.prediction_output
             LOGGER.info("Prediction output path " + self.prediction_output)
 
@@ -300,14 +301,13 @@ class ModelExecuter:
                     test_data_pred = test_data_pred.cpu()
                 test_data_pred = test_data_pred.numpy()
 
-                LOGGER.info("self.test_data_y.shape "+str(self.test_data_y.shape))
-                LOGGER.info("planning to write to csv "+self.prediction_output)
+                LOGGER.info("self.test_data_y.shape " + str(self.test_data_y.shape))
+                LOGGER.info("planning to write to csv " + self.prediction_output)
                 # LOGGER.info(str(test_data_pred[:20]))
 
                 # test_acc = np.sum(test_data_pred[:, 1] >= test_data_pred[:, 0]) / test_data_pred.shape[0]
                 test_acc = accuracy_score(self.test_data_y[:, 1],
                                           np.asarray((test_data_pred[:, 1] >= test_data_pred[:, 0]), dtype=int))
-                LOGGER.info("Prediction positive %.4f " % ((1.0 * np.sum(test_data_pred >= 0.5) / len(test_data_pred))))
 
                 # input(self.test_data_y[:, 1].shape)
                 # input(test_data_pred[:, 1])
@@ -317,8 +317,6 @@ class ModelExecuter:
                 # test_auc = metrics.auc_helper(self.test_data_y[:, 1] == 1, test_data_pred[:, 1])
                 LOGGER.info("testing every %d accuracy %.4f auc %.4f ", test_spacing, test_acc, test_auc)
                 self.results.append(Results(accuracy=test_acc, auc=test_auc))
-
-
 
         return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 
