@@ -16,8 +16,11 @@ PROBLEM_ID_KEY = 'problem_id'
 TEMPLATE_ID_KEY = 'template_id'
 USER_ID_KEY = 'user_id'
 
-# Usage: python ./cli.py rnn assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5 --item-id-col problem_id
+# Usage: python ./cli.py mlp assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5 --item-id-col problem_id
 # --num-iters 50 --dropout-prob 0.25 --first-learning-rate 5.0 --compress-dim 50 --hidden-dim 100
+
+#        python ./cli.py ncf assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5
+#  --item-id-col problem_id --num-iters 50 --dropout-prob 0.25 --first-learning-rate 5.0  --embedding_dim 210 --hidden-dim 256
 
 # Visualize call graph: pycallgraph graphviz -- ./cli.py rnn assistments skill_builder_data_corrected_big.txt ...
 
@@ -134,6 +137,8 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
 @click.argument('data_file')
 @click.option('--hidden-dim', '-h', type=int, nargs=1, default=100,
               help="The number of hidden units in the RNN.")
+@click.option('--embedding_dim', '-h', type=int, nargs=1, default=200,
+              help="Dimension of embeddings units in the MLP.")
 @click.option('--test-spacing', '-t', type=int, nargs=1, default=10,
               help="How many iterations before running the tests?")
 @click.option('--use-correct/--no-use-correct', default=True,
@@ -148,7 +153,7 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
 @click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
               help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
 @common_options
-def ncf(common, source, data_file, hidden_dim, test_spacing, use_correct, num_iters, dropout_prob, use_hints,
+def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_correct, num_iters, dropout_prob, use_hints,
         first_learning_rate):
     """
     MLP based correctness prediction
@@ -175,14 +180,14 @@ def ncf(common, source, data_file, hidden_dim, test_spacing, use_correct, num_it
                 hidden_dim=hidden_dim, test_spacing=test_spacing,
                 data_opts=data_opts,
                 first_learning_rate=first_learning_rate,
-                which_fold=common.which_fold, num_users=len(user_ids),user_ids=user_ids,item_ids=item_ids)
+                which_fold=common.which_fold, num_users=len(user_ids),user_ids=user_ids,item_ids=item_ids,embedding_dim=embedding_dim)
 
 
 @cli.command('mlp')
 @click.argument('source')
 @click.argument('data_file')
 @click.option('--hidden-dim', '-h', type=int, nargs=1, default=100,
-              help="The number of hidden units in the RNN.")
+              help="The number of hidden units in the MLP.")
 @click.option('--test-spacing', '-t', type=int, nargs=1, default=10,
               help="How many iterations before running the tests?")
 @click.option('--use-correct/--no-use-correct', default=True,

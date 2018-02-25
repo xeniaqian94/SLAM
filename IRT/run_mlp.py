@@ -18,10 +18,10 @@ from IRT.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, CONCEPT_IDX_KEY, USER
 LOGGER = logging.getLogger(__name__)
 
 
-class MLPOpts(namedtuple('MLPOpts', ['hidden_dim', 'num_iters', 'first_learning_rate', 'batch_size'])):
+class MLPOpts(namedtuple('MLPOpts', ['hidden_dim', 'num_iters', 'first_learning_rate', 'batch_size','embedding_dim'])):
 
-    def __new__(cls, hidden_dim=100, num_iters=100, first_learning_rate=0.001, batch_size=128):
-        return super(MLPOpts, cls).__new__(cls, hidden_dim, num_iters, first_learning_rate, batch_size)
+    def __new__(cls, hidden_dim=100, num_iters=100, first_learning_rate=0.001, batch_size=128, embedding_dim=200):
+        return super(MLPOpts, cls).__new__(cls, hidden_dim, num_iters, first_learning_rate, batch_size, embedding_dim)
 
 
 Results = namedtuple('Results', ['accuracy', 'auc'])
@@ -29,7 +29,7 @@ Results = namedtuple('Results', ['accuracy', 'auc'])
 
 def run(data_folds, num_folds, num_questions, num_iters, data_opts,
         hidden_dim=200, test_spacing=10,
-        first_learning_rate=0.001, which_fold=None, num_users=None, user_ids=None, item_ids=None):
+        first_learning_rate=0.001, which_fold=None, num_users=None, user_ids=None, item_ids=None, embedding_dim=200):
     """ Train and test the neural net
 
     :param iterable data_folds: an iterator over tuples of (train, test) datasets
@@ -63,7 +63,7 @@ def run(data_folds, num_folds, num_questions, num_iters, data_opts,
 
     mlps = []
     results = []
-    mlp_opts = MLPOpts(hidden_dim=hidden_dim, num_iters=num_iters, first_learning_rate=first_learning_rate)
+    mlp_opts = MLPOpts(hidden_dim=hidden_dim, num_iters=num_iters, first_learning_rate=first_learning_rate, embedding_dim=embedding_dim)
     np.random.seed(data_opts.seed)
 
     for fold_num, (train_data, test_data) in enumerate(data_folds):
@@ -161,12 +161,14 @@ class MLP(nn.Module):
 class NCF(nn.Module):
     def __init__(self, num_input, num_output, hiddem_dim, num_users, num_questions, emb_size):
         super(NCF, self).__init__()
+        LOGGER.info("Building model: user/exercise embedding size " + str(emb_size) + " hidden dimension " + str(hiddem_dim))
 
         self.user_embedding = nn.Embedding(num_users, emb_size)
         self.item_embedding = nn.Embedding(num_questions, emb_size)
         self.fc1 = nn.Linear(2 * emb_size + 1, hiddem_dim)
         self.fc2 = nn.Linear(hiddem_dim, num_output)
-        LOGGER.info("NCF input_dim=2*emb_size+1(timestamp) %d hidden_num %d output_dim %d", 2 * emb_size+1, hiddem_dim, num_output)
+        LOGGER.info("NCF input_dim=2*emb_size+1(timestamp) %d hidden_num %d output_dim %d", 2 * emb_size + 1,
+                    hiddem_dim, num_output)
 
     def forward(self, words):
         user_emb = self.user_embedding(words[:, 0].long())  # 2D Tensor of size [batch_size x emb_size]
@@ -199,7 +201,8 @@ class ModelExecuter:
         if use_mlp:
             self.model = MLP(self.train_data_X.shape[1], 2, opts.hidden_dim)  # binary classification
         else:
-            self.model = NCF(self.train_data_X.shape[1], 2, opts.hidden_dim, num_users, num_questions, 200)
+            self.model = NCF(self.train_data_X.shape[1], 2, opts.hidden_dim, num_users, num_questions,
+                             opts.embedding_dim)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=opts.first_learning_rate)
         # self.loss = nn.BCELoss()  # binary cross entropy
         self.loss = nn.MSELoss()
@@ -279,7 +282,7 @@ class ModelExecuter:
                 test_data_X = Variable(test_data_X, volatile=True)
                 test_data_pred = self.model(test_data_X).data
                 if self.use_cuda:
-                    test_data_pred=test_data_pred.cpu()
+                    test_data_pred = test_data_pred.cpu()
                 test_data_pred = test_data_pred.numpy()
 
                 # LOGGER.info(str(self.test_data_y[:20]))
@@ -323,13 +326,14 @@ def eval(train_data, test_data, num_questions, data_opts, mlp_opts, test_spacing
         test_mlp_data = build_mlp_data(test_data)
 
         model = ModelExecuter(train_mlp_data, mlp_opts, test_data=test_mlp_data,
-                            data_opts=data_opts)  # initialize the model
+                              data_opts=data_opts)  # initialize the model
     else:
         # input("user id example " + str(user_ids[5]) + " item_ids example " + str(item_ids[5])) # original id value
         train_ncf_data = build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids)
         test_ncf_data = build_ncf_data(test_data, num_users, num_questions, user_ids, item_ids)
-        model = ModelExecuter(train_ncf_data, mlp_opts, test_data=test_ncf_data, data_opts=data_opts, num_users=num_users,
-                            num_questions=num_questions)  # initialize the model
+        model = ModelExecuter(train_ncf_data, mlp_opts, test_data=test_ncf_data, data_opts=data_opts,
+                              num_users=num_users,
+                              num_questions=num_questions)  # initialize the model
 
     test_acc, test_auc, test_prob_correct, test_corrects = model.train_and_test(
         mlp_opts.num_iters,
