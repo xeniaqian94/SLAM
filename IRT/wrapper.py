@@ -12,13 +12,13 @@ DataOpts = namedtuple('DataOpts', ['num_folds', 'item_id_col', 'template_id_col'
                                    'remove_skill_nans', 'seed',
                                    'use_correct', 'use_hints', 'drop_duplicates',
                                    'max_interactions_per_user', 'min_interactions_per_user',
-                                   'proportion_students_retained', 'meta'])
+                                   'proportion_students_retained', 'meta', 'prediction_output'])
 DEFAULT_DATA_OPTS = DataOpts(num_folds=2, item_id_col=None, template_id_col=None,
                              concept_id_col=None,
                              remove_skill_nans=False, seed=0, use_correct=True, use_hints=False,
                              drop_duplicates=False,
                              max_interactions_per_user=None, min_interactions_per_user=2,
-                             proportion_students_retained=1.0, meta=False)
+                             proportion_students_retained=1.0, meta=False, prediction_output=None)
 
 
 def load_data(interaction_file, data_source, data_opts=DEFAULT_DATA_OPTS):
@@ -90,6 +90,7 @@ def load_data(interaction_file, data_source, data_opts=DEFAULT_DATA_OPTS):
     LOGGER.info(("After retaining proportional students, {now_rows:3,d}/{orig_rows:3,d} rows and "
                  "{now_students:3,d}/{orig_students:3,d} students remain on {questions:3,d} questions, {sparsity:4,f}").format(
         now_rows=len(data), orig_rows=num_rows,
-        now_students=len(chosen_user_ids), orig_students=num_students, questions=len(item_ids),sparsity=1-1.0*len(data.index)/(len(item_ids)*len(chosen_user_ids))))
+        now_students=len(chosen_user_ids), orig_students=num_students, questions=len(item_ids),
+        sparsity=1 - 1.0 * len(data.index) / (len(item_ids) * len(chosen_user_ids))))
 
     return data, user_ids, item_ids, template_ids, concept_ids

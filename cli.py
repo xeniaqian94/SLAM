@@ -156,9 +156,11 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
               help="Should we add a one-hot dimension to represent whether a student used a hint?")
 @click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
               help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
+@click.option('--prediction_output', default="data/Assistant/prediction/", type=str,
+              help="where output csv goes")
 @common_options
 def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_correct, num_iters, use_hints,
-        first_learning_rate):
+        first_learning_rate, prediction_output):
     """
     MLP based correctness prediction
     """
@@ -169,7 +171,8 @@ def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_
                          drop_duplicates=common.drop_duplicates,
                          max_interactions_per_user=common.max_inter,
                          min_interactions_per_user=common.min_inter,
-                         proportion_students_retained=common.proportion_students_retained, meta=False)
+                         proportion_students_retained=common.proportion_students_retained, meta=False,
+                         prediction_output=prediction_output+data_file.split("/")[-1])
 
     data, user_ids, item_ids, _, _ = load_data(data_file, source, data_opts)
     # input("user ids "+str(user_ids)+" "+str(max(user_ids)))
@@ -184,7 +187,8 @@ def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_
                 hidden_dim=hidden_dim, test_spacing=test_spacing,
                 data_opts=data_opts,
                 first_learning_rate=first_learning_rate,
-                which_fold=common.which_fold, num_users=len(user_ids),user_ids=user_ids,item_ids=item_ids,embedding_dim=embedding_dim)
+                which_fold=common.which_fold, num_users=len(user_ids), user_ids=user_ids, item_ids=item_ids,
+                embedding_dim=embedding_dim)
 
 
 @cli.command('mlp')
@@ -205,9 +209,11 @@ def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_
               help="Should we add a one-hot dimension to represent whether a student used a hint?")
 @click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
               help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
+@click.option('--prediction_output', default="data/Assistant/prediction/", type=str,
+              help="where output csv goes")
 @common_options
 def mlp(common, source, data_file, hidden_dim, test_spacing, use_correct, num_iters, dropout_prob, use_hints,
-        first_learning_rate):
+        first_learning_rate, prediction_output):
     """
     MLP based correctness prediction
     """
@@ -218,7 +224,8 @@ def mlp(common, source, data_file, hidden_dim, test_spacing, use_correct, num_it
                          drop_duplicates=common.drop_duplicates,
                          max_interactions_per_user=common.max_inter,
                          min_interactions_per_user=common.min_inter,
-                         proportion_students_retained=common.proportion_students_retained, meta=True)
+                         proportion_students_retained=common.proportion_students_retained, meta=True,
+                         prediction_output=prediction_output)
 
     # You might probably want to include more metadata features
 

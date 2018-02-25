@@ -8,12 +8,7 @@ import numpy as np
 import pandas as pd
 
 from IRT.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, CONCEPT_IDX_KEY, USER_IDX_KEY,
-                           TIME_IDX_KEY, CORRECT_KEY, SINGLE, FIRST_COLUMN)
-
-SKILL_ID_KEY = 'skill_id'
-PROBLEM_ID_KEY = 'problem_id'
-TEMPLATE_ID_KEY = 'template_id'
-USER_ID_KEY = 'user_id'
+                           TIME_IDX_KEY, CORRECT_KEY, SINGLE, ORDER_ID, ITEM_ID_KEY, SKILL_ID_KEY, USER_ID_KEY)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -47,7 +42,7 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
         concept ids corresponding to the concept indices
     :rtype: (pd.DataFrame, np.ndarray[int], np.ndarray[int], np.ndarray[int])
     """
-    data = pd.read_csv(file_path, low_memory=False, index_col=FIRST_COLUMN)
+    data = pd.read_csv(file_path, low_memory=False, index_col=ORDER_ID)
     LOGGER.info("Read {:3,d} rows from file".format(len(data)))
 
     # Get the time index
@@ -99,7 +94,7 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
     data.sort_values(sort_keys, inplace=True)
 
     # attach question index
-    item_ids, data[ITEM_IDX_KEY] = np.unique(data[item_id_col], return_inverse=True)
+    item_ids, data[ITEM_IDX_KEY] = np.unique(data[ITEM_ID_KEY], return_inverse=True)
     user_ids, data[USER_IDX_KEY] = np.unique(data[USER_ID_KEY], return_inverse=True)
 
     cols_to_keep = [USER_IDX_KEY, ITEM_IDX_KEY, CORRECT_KEY, TIME_IDX_KEY]
@@ -142,7 +137,10 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
             data[column] = (data[column] - data[column].mean()) / data[column].std()
 
     if meta == False:
-        data[TIME_IDX_KEY] = (data[TIME_IDX_KEY] - data[TIME_IDX_KEY].mean()) / data[TIME_IDX_KEY].std()  # we are always able to eoncode time
+        data[ORDER_ID] = data[TIME_IDX_KEY]
+        data[TIME_IDX_KEY] = (data[TIME_IDX_KEY] - data[TIME_IDX_KEY].mean()) / data[
+            TIME_IDX_KEY].std()  # we are always able to eoncode time
+        cols_to_keep += [USER_ID_KEY, item_id_col, ORDER_ID]
 
         # encode user_id and item_id as 0-N
 

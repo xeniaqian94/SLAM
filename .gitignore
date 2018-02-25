@@ -6,3 +6,6 @@ archive/*
 .ipynb_checkpoints/*
 .idea/*
 IRT/__pycache__/*
+__pycache__/*
+.DS_Store
+

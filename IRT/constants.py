@@ -19,7 +19,9 @@ CONCEPT_IDX_KEY = 'concept_idx'
 USER_IDX_KEY = 'user_idx'
 
 # First column in original csv
-FIRST_COLUMN='order_id'
+ORDER_ID= 'order_id'
+
+ITEM_ID_KEY='problem_id'
 
 # Represents a temporal ordering of items for the RNN. Can be any numeric
 # type as it's just used for sorting.
@@ -37,3 +39,9 @@ SINGLE = 'single'
 # datasets
 ASSISTMENTS = 'assistments'
 KDDCUP = 'kddcup'
+
+
+SKILL_ID_KEY = 'skill_id'
+PROBLEM_ID_KEY = 'problem_id'
+TEMPLATE_ID_KEY = 'template_id'
+USER_ID_KEY = 'user_id'

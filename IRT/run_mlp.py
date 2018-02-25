@@ -13,12 +13,12 @@ import numpy as np
 import IRT.metrics
 from IRT import metrics
 from IRT.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, CONCEPT_IDX_KEY, USER_IDX_KEY,
-                           TIME_IDX_KEY, CORRECT_KEY, SINGLE, FIRST_COLUMN)
+                           TIME_IDX_KEY, CORRECT_KEY, SINGLE, ORDER_ID, USER_ID_KEY, ITEM_ID_KEY)
 
 LOGGER = logging.getLogger(__name__)
 
 
-class MLPOpts(namedtuple('MLPOpts', ['hidden_dim', 'num_iters', 'first_learning_rate', 'batch_size','embedding_dim'])):
+class MLPOpts(namedtuple('MLPOpts', ['hidden_dim', 'num_iters', 'first_learning_rate', 'batch_size', 'embedding_dim'])):
 
     def __new__(cls, hidden_dim=100, num_iters=100, first_learning_rate=0.001, batch_size=128, embedding_dim=200):
         return super(MLPOpts, cls).__new__(cls, hidden_dim, num_iters, first_learning_rate, batch_size, embedding_dim)
@@ -63,7 +63,8 @@ def run(data_folds, num_folds, num_questions, num_iters, data_opts,
 
     mlps = []
     results = []
-    mlp_opts = MLPOpts(hidden_dim=hidden_dim, num_iters=num_iters, first_learning_rate=first_learning_rate, embedding_dim=embedding_dim)
+    mlp_opts = MLPOpts(hidden_dim=hidden_dim, num_iters=num_iters, first_learning_rate=first_learning_rate,
+                       embedding_dim=embedding_dim)
     np.random.seed(data_opts.seed)
 
     for fold_num, (train_data, test_data) in enumerate(data_folds):
@@ -120,6 +121,8 @@ def build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids):
             Build data ready for NCF input
     """
 
+    input("train_data in build_ncf_data")
+    input(train_data)
     train_data_label = train_data[[CORRECT_KEY]]
     train_data_label.loc[:, "in" + CORRECT_KEY] = 1 - train_data_label.loc[:, CORRECT_KEY]
     a = train_data[USER_IDX_KEY].unique()
@@ -130,7 +133,8 @@ def build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids):
 
     return (
         train_data[[USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY]].as_matrix(),
-        train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
+        train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix(), train_data[USER_ID_KEY],
+        train_data[ITEM_ID_KEY], train_data[ORDER_ID])
 
 
 import torch
@@ -196,6 +200,12 @@ class ModelExecuter:
 
         self.test_data_X = test_data[0]
         self.test_data_y = test_data[1]
+
+        if not use_mlp:
+            self.test_data_user_ids = test_data[2]
+            self.test_data_item_ids = test_data[3]
+            self.test_data_order_ids = test_data[4]
+
         self.opts = opts
         self.data_opts = data_opts
         if use_mlp:
@@ -204,7 +214,7 @@ class ModelExecuter:
             self.model = NCF(self.train_data_X.shape[1], 2, opts.hidden_dim, num_users, num_questions,
                              opts.embedding_dim)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=opts.first_learning_rate)
-        LOGGER.info("Model optimizer first learning rate is "+str(opts.first_learning_rate))
+        LOGGER.info("Model optimizer first learning rate is " + str(opts.first_learning_rate))
         # self.loss = nn.BCELoss()  # binary cross entropy
         self.loss = nn.MSELoss()
         self.use_cuda = torch.cuda.is_available()
@@ -212,6 +222,9 @@ class ModelExecuter:
         if self.use_cuda:
             self.model = self.model.cuda()
             LOGGER.info("Cuda detected, using cuda")
+        if opts.prediction_output != None:
+            self.prediction_output = opts.prediction_output
+            LOGGER.info("Prediction output path " + self.prediction_output)
 
     def train_and_test(self, num_iters, test_spacing=5):
         """
@@ -226,7 +239,7 @@ class ModelExecuter:
                  and boolean correct values on the test data.
         :rtype: float, float, np.ndarray(float), np.ndarray(float)
         """
-        LOGGER.info("Number of iterations for this fold "+str(num_iters))
+        LOGGER.info("Number of iterations for this fold " + str(num_iters))
 
         for epoch in np.arange(num_iters):
             LOGGER.info("Epoch " + str(epoch) + " starts! ")
@@ -287,7 +300,8 @@ class ModelExecuter:
                     test_data_pred = test_data_pred.cpu()
                 test_data_pred = test_data_pred.numpy()
 
-                # LOGGER.info(str(self.test_data_y[:20]))
+                LOGGER.info("self.test_data_y.shape "+str(self.test_data_y.shape))
+                LOGGER.info("planning to write to csv "+self.prediction_output)
                 # LOGGER.info(str(test_data_pred[:20]))
 
                 # test_acc = np.sum(test_data_pred[:, 1] >= test_data_pred[:, 0]) / test_data_pred.shape[0]
@@ -303,6 +317,8 @@ class ModelExecuter:
                 # test_auc = metrics.auc_helper(self.test_data_y[:, 1] == 1, test_data_pred[:, 1])
                 LOGGER.info("testing every %d accuracy %.4f auc %.4f ", test_spacing, test_acc, test_auc)
                 self.results.append(Results(accuracy=test_acc, auc=test_auc))
+
+
 
         return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 
