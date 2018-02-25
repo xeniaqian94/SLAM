@@ -332,11 +332,10 @@ class ModelExecuter:
                         len(test_data_pred[:, 1])))
                 df.to_csv(f, header=False)
         else:
-            with open(self.prediction_output, 'w') as f:
-                LOGGER.info(
-                    "Creating 1st fold prediction csv to " + self.prediction_output + " number of interactions " + str(
-                        len(test_data_pred[:, 1])))
-                df.to_csv(f)
+            LOGGER.info(
+                "Creating 1st fold prediction csv to " + self.prediction_output + " number of interactions " + str(
+                    len(test_data_pred[:, 1])))
+            df.to_csv(self.prediction_output)
 
         return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 
