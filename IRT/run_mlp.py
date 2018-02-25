@@ -121,8 +121,8 @@ def build_ncf_data(train_data, num_users, num_questions, user_ids, item_ids):
             Build data ready for NCF input
     """
 
-    input("train_data in build_ncf_data")
-    input(train_data)
+    # input("train_data in build_ncf_data")
+    # input(train_data)
     train_data_label = train_data[[CORRECT_KEY]]
     train_data_label.loc[:, "in" + CORRECT_KEY] = 1 - train_data_label.loc[:, CORRECT_KEY]
     a = train_data[USER_IDX_KEY].unique()
@@ -241,6 +241,7 @@ class ModelExecuter:
         :rtype: float, float, np.ndarray(float), np.ndarray(float)
         """
         LOGGER.info("Number of iterations for this fold " + str(num_iters))
+        LOGGER.info("self.test_data_y.shape " + str(self.test_data_y.shape))
 
         for epoch in np.arange(num_iters):
             LOGGER.info("Epoch " + str(epoch) + " starts! ")
@@ -301,8 +302,7 @@ class ModelExecuter:
                     test_data_pred = test_data_pred.cpu()
                 test_data_pred = test_data_pred.numpy()
 
-                LOGGER.info("self.test_data_y.shape " + str(self.test_data_y.shape))
-                LOGGER.info("planning to write to csv " + self.prediction_output)
+                # LOGGER.info("planning to write to csv " + self.prediction_output)
                 # LOGGER.info(str(test_data_pred[:20]))
 
                 # test_acc = np.sum(test_data_pred[:, 1] >= test_data_pred[:, 0]) / test_data_pred.shape[0]
