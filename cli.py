@@ -20,7 +20,11 @@ USER_ID_KEY = 'user_id'
 # --num-iters 50 --dropout-prob 0.25 --first-learning-rate 5.0 --compress-dim 50 --hidden-dim 100
 
 #        python ./cli.py ncf assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5
-#  --item-id-col problem_id --num-iters 50 --dropout-prob 0.25 --first-learning-rate 5.0  --embedding_dim 210 --hidden-dim 256
+#  --item-id-col problem_id --num-iters 50 --first-learning-rate 5.0  --embedding_dim 210 --hidden-dim 256
+
+
+# nohup python ./cli.py ncf assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5 --item-id-col problem_id --num-iters 50 --dropout-prob 0.25 --first-learning-rate 5.0  --embedding_dim 50 --hidden-dim 200 > emb_50_hidden_200.out &
+
 
 # Visualize call graph: pycallgraph graphviz -- ./cli.py rnn assistments skill_builder_data_corrected_big.txt ...
 
@@ -145,15 +149,15 @@ def rnn(common, source, data_file, compress_dim, hidden_dim, output_compress_dim
               help="If True, record correct and incorrect responses as different input dimensions")
 @click.option('--num-iters', '-n', type=int, default=50,
               help="How many iterations of training to perform on the RNN")
-@click.option('--dropout-prob', '-p', type=float, default=0.0,
-              help="The probability of a node being dropped during training. Default is 0.0 "
-                   "(i.e., no dropout)")
+# @click.option('--dropout-prob', '-p', type=float, default=0.0,
+#               help="The probability of a node being dropped during training. Default is 0.0 "
+#                    "(i.e., no dropout)")
 @click.option('--use-hints/--no-use-hints', default=False,
               help="Should we add a one-hot dimension to represent whether a student used a hint?")
 @click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
               help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
 @common_options
-def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_correct, num_iters, dropout_prob, use_hints,
+def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_correct, num_iters, use_hints,
         first_learning_rate):
     """
     MLP based correctness prediction
