@@ -7,9 +7,9 @@ import logging
 from collections import namedtuple
 from sklearn.metrics import *
 from sklearn.metrics import accuracy_score
-
+import pandas as pd
 import numpy as np
-
+import os
 import IRT.metrics
 from IRT import metrics
 from IRT.constants import (ITEM_IDX_KEY, TEMPLATE_IDX_KEY, CONCEPT_IDX_KEY, USER_IDX_KEY,
@@ -199,7 +199,7 @@ class ModelExecuter:
         self.train_data_y = np.asarray(train_data[1], dtype=np.int32)
 
         self.test_data_X = test_data[0]
-        self.test_data_y = test_data[1]
+        self.test_data_y = test_data[1]  # shape is #instance * 2, where 2 are 2 columns representing incorrect, correct
 
         if not use_mlp:
             self.test_data_user_ids = test_data[2]
@@ -317,6 +317,24 @@ class ModelExecuter:
                 # test_auc = metrics.auc_helper(self.test_data_y[:, 1] == 1, test_data_pred[:, 1])
                 LOGGER.info("testing every %d accuracy %.4f auc %.4f ", test_spacing, test_acc, test_auc)
                 self.results.append(Results(accuracy=test_acc, auc=test_auc))
+
+        df=pd.DataFrame()
+        df[ORDER_ID]=self.test_data_order_ids
+        df[USER_ID_KEY]=self.test_data_user_ids
+        df[ITEM_ID_KEY]=self.test_data_item_ids
+        df[CORRECT_KEY]=self.test_data_y[:,1]
+        df["prediction"]=test_data_pred[:,1]
+
+        if os._exists(self.prediction_output):
+            with open(self.prediction_output, 'a') as f:
+                LOGGER.info("Appending this fold prediction to "+self.prediction_output+" number of interactions "+str(len(test_data_pred[:,1])))
+                df.to_csv(f, header=False)
+        else:
+            with open(self.prediction_output, 'w') as f:
+                LOGGER.info(
+                    "Creating 1st fold prediction csv to " + self.prediction_output + " number of interactions " + str(
+                        len(test_data_pred[:, 1])))
+                df.to_csv(f)
 
         return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 
