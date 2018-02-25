@@ -161,7 +161,7 @@ class MLP(nn.Module):
 class NCF(nn.Module):
     def __init__(self, num_input, num_output, hiddem_dim, num_users, num_questions, emb_size):
         super(NCF, self).__init__()
-        LOGGER.info("Building model: user/exercise embedding size " + str(emb_size) + " hidden dimension " + str(hiddem_dim))
+        LOGGER.info("Building model: embedding size " + str(emb_size) + " hidden dimension " + str(hiddem_dim))
 
         self.user_embedding = nn.Embedding(num_users, emb_size)
         self.item_embedding = nn.Embedding(num_questions, emb_size)
@@ -204,6 +204,7 @@ class ModelExecuter:
             self.model = NCF(self.train_data_X.shape[1], 2, opts.hidden_dim, num_users, num_questions,
                              opts.embedding_dim)
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=opts.first_learning_rate)
+        LOGGER.info("Model optimizer first learning rate is "+str(opts.first_learning_rate))
         # self.loss = nn.BCELoss()  # binary cross entropy
         self.loss = nn.MSELoss()
         self.use_cuda = torch.cuda.is_available()
@@ -225,6 +226,7 @@ class ModelExecuter:
                  and boolean correct values on the test data.
         :rtype: float, float, np.ndarray(float), np.ndarray(float)
         """
+        LOGGER.info("Number of iterations for this fold "+str(num_iters))
 
         for epoch in np.arange(num_iters):
             LOGGER.info("Epoch " + str(epoch) + " starts! ")
