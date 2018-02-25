@@ -1,4 +1,4 @@
-## 11-747 Neural Network for NLP, 18 Winter, Final Project: Second Language Acquisition Modeling
+## 11-747 Neural Network for NLP, Second Language Acquisition Modeling
 
 # Dataset
 
