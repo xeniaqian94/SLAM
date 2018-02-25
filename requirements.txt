@@ -1,0 +1,7 @@
+future==0.16.0
+numpy==1.13.3
+pandas==0.20.3
+scipy==0.19.1
+torch==0.3.0.post4
+click==6.7
+scikit_learn==0.19.1
