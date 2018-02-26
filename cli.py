@@ -176,7 +176,7 @@ def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_
 
     if os.path.exists(data_opts.prediction_output):
         os.remove(data_opts.prediction_output)
-
+    # input(data_opts)
     data, user_ids, item_ids, _, _ = load_data(data_file, source, data_opts)
 
     num_questions = len(item_ids)
