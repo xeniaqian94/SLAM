@@ -111,6 +111,7 @@ def build_mlp_data(train_data):
     # return (train_data.drop(CORRECT_KEY, axis=1).as_matrix(), train_data[CORRECT_KEY].as_matrix())
 
     # input(train_data.drop([CORRECT_KEY, USER_IDX_KEY,ITEM_IDX_KEY,TIME_IDX_KEY],axis=1))
+    # input(train_data.drop([CORRECT_KEY, USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY], axis=1))
     return (
         train_data.drop([CORRECT_KEY, USER_IDX_KEY, ITEM_IDX_KEY, TIME_IDX_KEY], axis=1).as_matrix(),
         train_data_label[["in" + CORRECT_KEY, CORRECT_KEY]].as_matrix())
@@ -208,6 +209,7 @@ class ModelExecuter:
 
         self.opts = opts
         self.data_opts = data_opts
+        self.use_mlp=use_mlp
         if use_mlp:
             self.model = MLP(self.train_data_X.shape[1], 2, opts.hidden_dim)  # binary classification
         else:
@@ -318,24 +320,25 @@ class ModelExecuter:
                 LOGGER.info("testing every %d accuracy %.4f auc %.4f ", test_spacing, test_acc, test_auc)
                 self.results.append(Results(accuracy=test_acc, auc=test_auc))
 
-        df = pd.DataFrame()
-        df[USER_ID_KEY] = self.test_data_user_ids
-        df[ITEM_ID_KEY] = self.test_data_item_ids
-        df[CORRECT_KEY] = self.test_data_y[:, 1]
-        df["prediction"] = test_data_pred[:, 1]
+        if (not self.use_mlp):
+            df = pd.DataFrame()
+            df[USER_ID_KEY] = self.test_data_user_ids
+            df[ITEM_ID_KEY] = self.test_data_item_ids
+            df[CORRECT_KEY] = self.test_data_y[:, 1]
+            df["prediction"] = test_data_pred[:, 1]
 
-        if os.path.exists(self.prediction_output):
-            with open(self.prediction_output, 'a') as f:
+            if os.path.exists(self.prediction_output):
+                with open(self.prediction_output, 'a') as f:
+                    LOGGER.info(
+                        "Appending this fold prediction to " + self.prediction_output + ", number of interactions " + str(
+                            len(test_data_pred[:, 1])))
+                    df.to_csv(f, mode='a', header=False)
+            else:
                 LOGGER.info(
-                    "Appending this fold prediction to " + self.prediction_output + ", number of interactions " + str(
+                    "Creating 1st fold prediction csv to " + self.prediction_output + ", number of interactions " + str(
                         len(test_data_pred[:, 1])))
-                df.to_csv(f, mode='a', header=False)
-        else:
-            LOGGER.info(
-                "Creating 1st fold prediction csv to " + self.prediction_output + ", number of interactions " + str(
-                    len(test_data_pred[:, 1])))
-            df.to_csv(self.prediction_output)
-            LOGGER.info("Now file exists? " + str(os.path.exists(self.prediction_output)))
+                df.to_csv(self.prediction_output)
+                LOGGER.info("Now file exists? " + str(os.path.exists(self.prediction_output)))
 
         return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 

@@ -22,10 +22,16 @@ We use a deduplicated version of `skill_builder_data.csv`, named as `skill_build
 
 ### On Assistment09 benchmark:
 
+To run a neural collaborative filtering model (based on MLP):
+
     python ./cli.py ncf assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5 --item-id-col problem_id --num-iters 50 --first-learning-rate 0.001 --embedding_dim 200 --hidden-dim 200
 
 A `.csv` dump of cross-validated prediction is located at `data/Assistant/prediction/skill_builder_data.csv`
- 
+
+You could also run a naive MLP with pre-defined features (e.g. ms_response, attempt, opportunity, etc. ) from `.csv`
+
+    python ./cli.py mlp assistments data/Assistant/skill_builder_data.csv --no-remove-skill-nans --drop-duplicates --num-folds 5 --item-id-col problem_id --num-iters 50 --dropout-prob 0.25 --first-learning-rate 0.01 --hidden-dim 100
+     
 ### On Duolingo dataset:
 
 To train a (official release baseline) Logistic Regression and predict:
