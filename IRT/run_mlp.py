@@ -323,7 +323,6 @@ class ModelExecuter:
         df[ITEM_ID_KEY] = self.test_data_item_ids
         df[CORRECT_KEY] = self.test_data_y[:, 1]
         df["prediction"] = test_data_pred[:, 1]
-        input(str(os.path.exists(self.prediction_output)) + " " + self.prediction_output)
 
         if os.path.exists(self.prediction_output):
             with open(self.prediction_output, 'a') as f:
