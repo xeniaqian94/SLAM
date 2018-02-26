@@ -227,7 +227,7 @@ class ModelExecuter:
             self.prediction_output = data_opts.prediction_output
             if os.path.exists(data_opts.prediction_output):
                 os.remove(data_opts.prediction_output)
-            LOGGER.info("Prediction output path " + self.prediction_output+" (removing existing one)!")
+            LOGGER.info("Prediction output path " + self.prediction_output + " (removing existing one)!")
 
     def train_and_test(self, num_iters, test_spacing=5):
         """
@@ -325,18 +325,20 @@ class ModelExecuter:
         df[ITEM_ID_KEY] = self.test_data_item_ids
         df[CORRECT_KEY] = self.test_data_y[:, 1]
         df["prediction"] = test_data_pred[:, 1]
-        input(str(os.path.exists(self.prediction_output))+" "+self.prediction_output)
+        input(str(os.path.exists(self.prediction_output)) + " " + self.prediction_output)
+
         if os.path.exists(self.prediction_output):
             with open(self.prediction_output, 'a') as f:
                 LOGGER.info(
-                    "Appending this fold prediction to " + self.prediction_output + " number of interactions " + str(
+                    "Appending this fold prediction to " + self.prediction_output + ", number of interactions " + str(
                         len(test_data_pred[:, 1])))
-                df.to_csv(f, header=False)
+                df.to_csv(f, mode='a', header=False)
         else:
             LOGGER.info(
-                "Creating 1st fold prediction csv to " + self.prediction_output + " number of interactions " + str(
+                "Creating 1st fold prediction csv to " + self.prediction_output + ", number of interactions " + str(
                     len(test_data_pred[:, 1])))
             df.to_csv(self.prediction_output)
+            LOGGER.info("Now file exists? " + str(os.path.exists(self.prediction_output)))
 
         return test_acc, test_auc, test_data_pred[:, 1], test_data_pred[:, 1] >= test_data_pred[:, 0]
 
