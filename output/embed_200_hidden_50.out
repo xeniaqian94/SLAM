@@ -1,0 +1,364 @@
+2018-02-26 11:32:31,552 [INFO] IRT.wrapper: Using IRT.assistments data with problem_id for item_id_col, None for template_id_col, and None for concept_id_col
+2018-02-26 11:32:32,779 [INFO] IRT.assistments: Read 525,534 rows from file
+2018-02-26 11:32:32,780 [INFO] IRT.assistments: Dataframe index key is order_id
+2018-02-26 11:32:33,052 [INFO] IRT.assistments: Removed 178,674 duplicate rows (346,860 rows remaining)
+2018-02-26 11:32:33,640 [INFO] IRT.assistments: Removed students with <2 interactions (346,740 rows remaining)
+2018-02-26 11:32:33,640 [INFO] IRT.assistments: maxInterNone mininter 2
+2018-02-26 11:32:33,786 [INFO] IRT.assistments: concept_id_col not supplied, not using concepts
+2018-02-26 11:32:33,786 [INFO] IRT.assistments: template_id_col not supplied, not using templates
+2018-02-26 11:32:33,786 [INFO] IRT.assistments: Processed data: 346,740 interactions, 4,097 students; 26,684 items,   0 templates,   0 concepts columns to keep: ['user_idx', 'item_idx', 'correct', 'time_idx']
+2018-02-26 11:32:33,827 [INFO] IRT.wrapper: After retaining proportional students, 346,740/346,740 rows and 4,097/4,097 students remain on 26,684 questions, 0.996828
+2018-02-26 11:32:33,887 [INFO] IRT.run_mlp: this fold has 69348 interactions and students 3723
+2018-02-26 11:32:33,887 [INFO] IRT.run_mlp: Beginning fold 1
+2018-02-26 11:32:33,887 [INFO] IRT.run_mlp: Training RNN, fold 1, train length 277392, test length 69348
+2018-02-26 11:32:33,887 [INFO] IRT.run_mlp: num_questions=26684? 26684 num_users=4097? 4097
+/home/chen/anaconda3/lib/python3.6/site-packages/pandas/core/indexing.py:337: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy
+  self.obj[key] = _infer_fill_value(value)
+/home/chen/anaconda3/lib/python3.6/site-packages/pandas/core/indexing.py:517: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row_indexer,col_indexer] = value instead
+
+See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html#indexing-view-versus-copy
+  self.obj[item] = s
+2018-02-26 11:32:33,988 [INFO] IRT.run_mlp: Building model: embedding size 200 hidden dimension 50
+2018-02-26 11:32:34,318 [INFO] IRT.run_mlp: NCF input_dim=2*emb_size+1(timestamp) 401 hidden_num 50 output_dim 2
+2018-02-26 11:32:34,319 [INFO] IRT.run_mlp: Model optimizer first learning rate is 0.001
+2018-02-26 11:32:35,884 [INFO] IRT.run_mlp: Cuda detected, using cuda
+2018-02-26 11:32:35,884 [INFO] IRT.run_mlp: Prediction output path data/Assistant/prediction/skill_builder_data.csv (removing existing one)!
+2018-02-26 11:32:35,884 [INFO] IRT.run_mlp: Number of iterations for this fold 50
+2018-02-26 11:32:35,884 [INFO] IRT.run_mlp: self.test_data_y.shape (69348, 2)
+2018-02-26 11:32:45,285 [INFO] IRT.run_mlp: epoch 0 training loss (over all batches) 457.2443 
+2018-02-26 11:32:54,521 [INFO] IRT.run_mlp: epoch 1 training loss (over all batches) 389.4458 
+2018-02-26 11:33:03,777 [INFO] IRT.run_mlp: epoch 2 training loss (over all batches) 351.0789 
+2018-02-26 11:33:13,046 [INFO] IRT.run_mlp: epoch 3 training loss (over all batches) 324.6627 
+2018-02-26 11:33:22,301 [INFO] IRT.run_mlp: epoch 4 training loss (over all batches) 295.4670 
+2018-02-26 11:33:31,603 [INFO] IRT.run_mlp: epoch 5 training loss (over all batches) 260.4592 
+2018-02-26 11:33:40,844 [INFO] IRT.run_mlp: epoch 6 training loss (over all batches) 223.1674 
+2018-02-26 11:33:50,106 [INFO] IRT.run_mlp: epoch 7 training loss (over all batches) 187.5853 
+2018-02-26 11:33:59,384 [INFO] IRT.run_mlp: epoch 8 training loss (over all batches) 156.4607 
+2018-02-26 11:34:08,666 [INFO] IRT.run_mlp: epoch 9 training loss (over all batches) 130.6084 
+2018-02-26 11:34:17,945 [INFO] IRT.run_mlp: epoch 10 training loss (over all batches) 110.2303 
+2018-02-26 11:34:17,966 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7092 auc 0.7462 
+2018-02-26 11:34:27,235 [INFO] IRT.run_mlp: epoch 11 training loss (over all batches) 94.4278 
+2018-02-26 11:34:36,494 [INFO] IRT.run_mlp: epoch 12 training loss (over all batches) 82.3539 
+2018-02-26 11:34:45,744 [INFO] IRT.run_mlp: epoch 13 training loss (over all batches) 73.4743 
+2018-02-26 11:34:55,043 [INFO] IRT.run_mlp: epoch 14 training loss (over all batches) 66.7437 
+2018-02-26 11:35:04,319 [INFO] IRT.run_mlp: epoch 15 training loss (over all batches) 61.0277 
+2018-02-26 11:35:13,583 [INFO] IRT.run_mlp: epoch 16 training loss (over all batches) 56.6512 
+2018-02-26 11:35:22,849 [INFO] IRT.run_mlp: epoch 17 training loss (over all batches) 53.4043 
+2018-02-26 11:35:32,111 [INFO] IRT.run_mlp: epoch 18 training loss (over all batches) 51.1751 
+2018-02-26 11:35:41,380 [INFO] IRT.run_mlp: epoch 19 training loss (over all batches) 48.6276 
+2018-02-26 11:35:50,697 [INFO] IRT.run_mlp: epoch 20 training loss (over all batches) 46.7636 
+2018-02-26 11:35:50,715 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7149 auc 0.7481 
+2018-02-26 11:35:59,999 [INFO] IRT.run_mlp: epoch 21 training loss (over all batches) 45.3302 
+2018-02-26 11:36:09,243 [INFO] IRT.run_mlp: epoch 22 training loss (over all batches) 44.2386 
+2018-02-26 11:36:18,526 [INFO] IRT.run_mlp: epoch 23 training loss (over all batches) 43.0571 
+2018-02-26 11:36:27,827 [INFO] IRT.run_mlp: epoch 24 training loss (over all batches) 42.2511 
+2018-02-26 11:36:37,141 [INFO] IRT.run_mlp: epoch 25 training loss (over all batches) 41.3737 
+2018-02-26 11:36:46,437 [INFO] IRT.run_mlp: epoch 26 training loss (over all batches) 40.2868 
+2018-02-26 11:36:55,743 [INFO] IRT.run_mlp: epoch 27 training loss (over all batches) 39.7451 
+2018-02-26 11:37:05,053 [INFO] IRT.run_mlp: epoch 28 training loss (over all batches) 39.2619 
+2018-02-26 11:37:14,332 [INFO] IRT.run_mlp: epoch 29 training loss (over all batches) 38.4762 
+2018-02-26 11:37:23,624 [INFO] IRT.run_mlp: epoch 30 training loss (over all batches) 38.2374 
+2018-02-26 11:37:23,641 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7158 auc 0.7502 
+2018-02-26 11:37:32,916 [INFO] IRT.run_mlp: epoch 31 training loss (over all batches) 37.9054 
+2018-02-26 11:37:42,266 [INFO] IRT.run_mlp: epoch 32 training loss (over all batches) 37.6069 
+2018-02-26 11:37:51,566 [INFO] IRT.run_mlp: epoch 33 training loss (over all batches) 37.3295 
+2018-02-26 11:38:00,874 [INFO] IRT.run_mlp: epoch 34 training loss (over all batches) 36.8866 
+2018-02-26 11:38:10,214 [INFO] IRT.run_mlp: epoch 35 training loss (over all batches) 36.7800 
+2018-02-26 11:38:19,532 [INFO] IRT.run_mlp: epoch 36 training loss (over all batches) 36.3966 
+2018-02-26 11:38:28,844 [INFO] IRT.run_mlp: epoch 37 training loss (over all batches) 35.9324 
+2018-02-26 11:38:38,176 [INFO] IRT.run_mlp: epoch 38 training loss (over all batches) 35.6309 
+2018-02-26 11:38:47,508 [INFO] IRT.run_mlp: epoch 39 training loss (over all batches) 35.5305 
+2018-02-26 11:38:56,803 [INFO] IRT.run_mlp: epoch 40 training loss (over all batches) 35.0725 
+2018-02-26 11:38:56,822 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7205 auc 0.7501 
+2018-02-26 11:39:06,157 [INFO] IRT.run_mlp: epoch 41 training loss (over all batches) 34.7773 
+2018-02-26 11:39:15,458 [INFO] IRT.run_mlp: epoch 42 training loss (over all batches) 35.1298 
+2018-02-26 11:39:24,778 [INFO] IRT.run_mlp: epoch 43 training loss (over all batches) 34.3877 
+2018-02-26 11:39:34,094 [INFO] IRT.run_mlp: epoch 44 training loss (over all batches) 34.3612 
+2018-02-26 11:39:43,400 [INFO] IRT.run_mlp: epoch 45 training loss (over all batches) 34.1826 
+2018-02-26 11:39:52,703 [INFO] IRT.run_mlp: epoch 46 training loss (over all batches) 33.9520 
+2018-02-26 11:40:01,398 [INFO] IRT.run_mlp: epoch 47 training loss (over all batches) 33.7740 
+2018-02-26 11:40:10,706 [INFO] IRT.run_mlp: epoch 48 training loss (over all batches) 33.5008 
+2018-02-26 11:40:20,033 [INFO] IRT.run_mlp: epoch 49 training loss (over all batches) 33.3266 
+2018-02-26 11:40:20,038 [INFO] IRT.run_mlp: Appending this fold prediction to data/Assistant/prediction/skill_builder_data.csv, number of interactions 69348
+2018-02-26 11:40:20,257 [INFO] IRT.run_mlp: Fold 1: Num Interactions: 69348; Test Accuracy: 0.72045; Test AUC: 0.75007
+2018-02-26 11:40:20,300 [INFO] IRT.run_mlp: this fold has 69348 interactions and students 3716
+2018-02-26 11:40:20,301 [INFO] IRT.run_mlp: Beginning fold 2
+2018-02-26 11:40:20,301 [INFO] IRT.run_mlp: Training RNN, fold 2, train length 277392, test length 69348
+2018-02-26 11:40:20,301 [INFO] IRT.run_mlp: num_questions=26684? 26684 num_users=4097? 4097
+2018-02-26 11:40:20,392 [INFO] IRT.run_mlp: Building model: embedding size 200 hidden dimension 50
+2018-02-26 11:40:20,716 [INFO] IRT.run_mlp: NCF input_dim=2*emb_size+1(timestamp) 401 hidden_num 50 output_dim 2
+2018-02-26 11:40:20,716 [INFO] IRT.run_mlp: Model optimizer first learning rate is 0.001
+2018-02-26 11:40:20,722 [INFO] IRT.run_mlp: Cuda detected, using cuda
+2018-02-26 11:40:20,722 [INFO] IRT.run_mlp: Prediction output path data/Assistant/prediction/skill_builder_data.csv (removing existing one)!
+2018-02-26 11:40:20,722 [INFO] IRT.run_mlp: Number of iterations for this fold 50
+2018-02-26 11:40:20,722 [INFO] IRT.run_mlp: self.test_data_y.shape (69348, 2)
+2018-02-26 11:40:30,004 [INFO] IRT.run_mlp: epoch 0 training loss (over all batches) 457.2355 
+2018-02-26 11:40:39,309 [INFO] IRT.run_mlp: epoch 1 training loss (over all batches) 389.8638 
+2018-02-26 11:40:48,582 [INFO] IRT.run_mlp: epoch 2 training loss (over all batches) 351.7145 
+2018-02-26 11:40:57,923 [INFO] IRT.run_mlp: epoch 3 training loss (over all batches) 324.6846 
+2018-02-26 11:41:07,207 [INFO] IRT.run_mlp: epoch 4 training loss (over all batches) 294.4254 
+2018-02-26 11:41:16,531 [INFO] IRT.run_mlp: epoch 5 training loss (over all batches) 258.8395 
+2018-02-26 11:41:25,838 [INFO] IRT.run_mlp: epoch 6 training loss (over all batches) 219.8847 
+2018-02-26 11:41:35,180 [INFO] IRT.run_mlp: epoch 7 training loss (over all batches) 183.3443 
+2018-02-26 11:41:44,497 [INFO] IRT.run_mlp: epoch 8 training loss (over all batches) 151.7288 
+2018-02-26 11:41:53,799 [INFO] IRT.run_mlp: epoch 9 training loss (over all batches) 126.2254 
+2018-02-26 11:42:03,135 [INFO] IRT.run_mlp: epoch 10 training loss (over all batches) 106.2028 
+2018-02-26 11:42:03,154 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7080 auc 0.7444 
+2018-02-26 11:42:12,407 [INFO] IRT.run_mlp: epoch 11 training loss (over all batches) 91.2860 
+2018-02-26 11:42:21,749 [INFO] IRT.run_mlp: epoch 12 training loss (over all batches) 80.3230 
+2018-02-26 11:42:31,056 [INFO] IRT.run_mlp: epoch 13 training loss (over all batches) 71.1958 
+2018-02-26 11:42:40,358 [INFO] IRT.run_mlp: epoch 14 training loss (over all batches) 65.1055 
+2018-02-26 11:42:49,663 [INFO] IRT.run_mlp: epoch 15 training loss (over all batches) 59.9406 
+2018-02-26 11:42:58,975 [INFO] IRT.run_mlp: epoch 16 training loss (over all batches) 56.2384 
+2018-02-26 11:43:08,256 [INFO] IRT.run_mlp: epoch 17 training loss (over all batches) 52.8643 
+2018-02-26 11:43:17,583 [INFO] IRT.run_mlp: epoch 18 training loss (over all batches) 50.7612 
+2018-02-26 11:43:26,898 [INFO] IRT.run_mlp: epoch 19 training loss (over all batches) 48.4274 
+2018-02-26 11:43:36,192 [INFO] IRT.run_mlp: epoch 20 training loss (over all batches) 46.6992 
+2018-02-26 11:43:36,210 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7126 auc 0.7488 
+2018-02-26 11:43:45,506 [INFO] IRT.run_mlp: epoch 21 training loss (over all batches) 45.6374 
+2018-02-26 11:43:54,787 [INFO] IRT.run_mlp: epoch 22 training loss (over all batches) 44.5041 
+2018-02-26 11:44:04,119 [INFO] IRT.run_mlp: epoch 23 training loss (over all batches) 42.8175 
+2018-02-26 11:44:13,441 [INFO] IRT.run_mlp: epoch 24 training loss (over all batches) 42.3879 
+2018-02-26 11:44:22,717 [INFO] IRT.run_mlp: epoch 25 training loss (over all batches) 41.4348 
+2018-02-26 11:44:32,015 [INFO] IRT.run_mlp: epoch 26 training loss (over all batches) 40.4263 
+2018-02-26 11:44:41,283 [INFO] IRT.run_mlp: epoch 27 training loss (over all batches) 40.1858 
+2018-02-26 11:44:50,589 [INFO] IRT.run_mlp: epoch 28 training loss (over all batches) 39.1516 
+2018-02-26 11:44:59,858 [INFO] IRT.run_mlp: epoch 29 training loss (over all batches) 38.9658 
+2018-02-26 11:45:09,184 [INFO] IRT.run_mlp: epoch 30 training loss (over all batches) 38.1545 
+2018-02-26 11:45:09,201 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7188 auc 0.7508 
+2018-02-26 11:45:18,493 [INFO] IRT.run_mlp: epoch 31 training loss (over all batches) 37.7454 
+2018-02-26 11:45:27,827 [INFO] IRT.run_mlp: epoch 32 training loss (over all batches) 37.2637 
+2018-02-26 11:45:37,104 [INFO] IRT.run_mlp: epoch 33 training loss (over all batches) 36.8008 
+2018-02-26 11:45:46,439 [INFO] IRT.run_mlp: epoch 34 training loss (over all batches) 36.6316 
+2018-02-26 11:45:55,735 [INFO] IRT.run_mlp: epoch 35 training loss (over all batches) 36.0834 
+2018-02-26 11:46:05,012 [INFO] IRT.run_mlp: epoch 36 training loss (over all batches) 35.5898 
+2018-02-26 11:46:14,361 [INFO] IRT.run_mlp: epoch 37 training loss (over all batches) 35.6498 
+2018-02-26 11:46:23,653 [INFO] IRT.run_mlp: epoch 38 training loss (over all batches) 35.1838 
+2018-02-26 11:46:32,948 [INFO] IRT.run_mlp: epoch 39 training loss (over all batches) 35.0230 
+2018-02-26 11:46:42,259 [INFO] IRT.run_mlp: epoch 40 training loss (over all batches) 34.8243 
+2018-02-26 11:46:42,276 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7237 auc 0.7513 
+2018-02-26 11:46:51,589 [INFO] IRT.run_mlp: epoch 41 training loss (over all batches) 34.7229 
+2018-02-26 11:47:00,947 [INFO] IRT.run_mlp: epoch 42 training loss (over all batches) 34.3260 
+2018-02-26 11:47:10,212 [INFO] IRT.run_mlp: epoch 43 training loss (over all batches) 34.0966 
+2018-02-26 11:47:19,530 [INFO] IRT.run_mlp: epoch 44 training loss (over all batches) 33.8652 
+2018-02-26 11:47:28,787 [INFO] IRT.run_mlp: epoch 45 training loss (over all batches) 33.7441 
+2018-02-26 11:47:38,146 [INFO] IRT.run_mlp: epoch 46 training loss (over all batches) 33.4106 
+2018-02-26 11:47:46,833 [INFO] IRT.run_mlp: epoch 47 training loss (over all batches) 33.6598 
+2018-02-26 11:47:56,175 [INFO] IRT.run_mlp: epoch 48 training loss (over all batches) 33.5692 
+2018-02-26 11:48:05,500 [INFO] IRT.run_mlp: epoch 49 training loss (over all batches) 33.1040 
+2018-02-26 11:48:05,506 [INFO] IRT.run_mlp: Appending this fold prediction to data/Assistant/prediction/skill_builder_data.csv, number of interactions 69348
+2018-02-26 11:48:05,727 [INFO] IRT.run_mlp: Fold 2: Num Interactions: 69348; Test Accuracy: 0.72371; Test AUC: 0.75133
+2018-02-26 11:48:05,769 [INFO] IRT.run_mlp: this fold has 69348 interactions and students 3730
+2018-02-26 11:48:05,769 [INFO] IRT.run_mlp: Beginning fold 3
+2018-02-26 11:48:05,769 [INFO] IRT.run_mlp: Training RNN, fold 3, train length 277392, test length 69348
+2018-02-26 11:48:05,769 [INFO] IRT.run_mlp: num_questions=26684? 26684 num_users=4097? 4097
+2018-02-26 11:48:05,860 [INFO] IRT.run_mlp: Building model: embedding size 200 hidden dimension 50
+2018-02-26 11:48:06,185 [INFO] IRT.run_mlp: NCF input_dim=2*emb_size+1(timestamp) 401 hidden_num 50 output_dim 2
+2018-02-26 11:48:06,185 [INFO] IRT.run_mlp: Model optimizer first learning rate is 0.001
+2018-02-26 11:48:06,190 [INFO] IRT.run_mlp: Cuda detected, using cuda
+2018-02-26 11:48:06,190 [INFO] IRT.run_mlp: Prediction output path data/Assistant/prediction/skill_builder_data.csv (removing existing one)!
+2018-02-26 11:48:06,190 [INFO] IRT.run_mlp: Number of iterations for this fold 50
+2018-02-26 11:48:06,190 [INFO] IRT.run_mlp: self.test_data_y.shape (69348, 2)
+2018-02-26 11:48:15,497 [INFO] IRT.run_mlp: epoch 0 training loss (over all batches) 457.0018 
+2018-02-26 11:48:24,828 [INFO] IRT.run_mlp: epoch 1 training loss (over all batches) 389.6645 
+2018-02-26 11:48:34,127 [INFO] IRT.run_mlp: epoch 2 training loss (over all batches) 351.3607 
+2018-02-26 11:48:43,461 [INFO] IRT.run_mlp: epoch 3 training loss (over all batches) 323.9740 
+2018-02-26 11:48:52,741 [INFO] IRT.run_mlp: epoch 4 training loss (over all batches) 293.7566 
+2018-02-26 11:49:02,049 [INFO] IRT.run_mlp: epoch 5 training loss (over all batches) 257.8988 
+2018-02-26 11:49:11,306 [INFO] IRT.run_mlp: epoch 6 training loss (over all batches) 219.7442 
+2018-02-26 11:49:20,606 [INFO] IRT.run_mlp: epoch 7 training loss (over all batches) 183.8243 
+2018-02-26 11:49:29,936 [INFO] IRT.run_mlp: epoch 8 training loss (over all batches) 153.3785 
+2018-02-26 11:49:39,204 [INFO] IRT.run_mlp: epoch 9 training loss (over all batches) 127.4843 
+2018-02-26 11:49:48,503 [INFO] IRT.run_mlp: epoch 10 training loss (over all batches) 108.4348 
+2018-02-26 11:49:48,521 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7099 auc 0.7463 
+2018-02-26 11:49:57,803 [INFO] IRT.run_mlp: epoch 11 training loss (over all batches) 92.8581 
+2018-02-26 11:50:07,125 [INFO] IRT.run_mlp: epoch 12 training loss (over all batches) 81.2332 
+2018-02-26 11:50:16,386 [INFO] IRT.run_mlp: epoch 13 training loss (over all batches) 72.4358 
+2018-02-26 11:50:25,717 [INFO] IRT.run_mlp: epoch 14 training loss (over all batches) 66.2318 
+2018-02-26 11:50:35,000 [INFO] IRT.run_mlp: epoch 15 training loss (over all batches) 61.0350 
+2018-02-26 11:50:44,304 [INFO] IRT.run_mlp: epoch 16 training loss (over all batches) 57.2065 
+2018-02-26 11:50:53,595 [INFO] IRT.run_mlp: epoch 17 training loss (over all batches) 54.0653 
+2018-02-26 11:51:02,864 [INFO] IRT.run_mlp: epoch 18 training loss (over all batches) 50.9612 
+2018-02-26 11:51:12,192 [INFO] IRT.run_mlp: epoch 19 training loss (over all batches) 49.2131 
+2018-02-26 11:51:21,469 [INFO] IRT.run_mlp: epoch 20 training loss (over all batches) 47.4828 
+2018-02-26 11:51:21,488 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7160 auc 0.7498 
+2018-02-26 11:51:30,807 [INFO] IRT.run_mlp: epoch 21 training loss (over all batches) 45.9185 
+2018-02-26 11:51:40,073 [INFO] IRT.run_mlp: epoch 22 training loss (over all batches) 44.3611 
+2018-02-26 11:51:49,378 [INFO] IRT.run_mlp: epoch 23 training loss (over all batches) 43.3070 
+2018-02-26 11:51:58,670 [INFO] IRT.run_mlp: epoch 24 training loss (over all batches) 42.1806 
+2018-02-26 11:52:07,940 [INFO] IRT.run_mlp: epoch 25 training loss (over all batches) 41.5085 
+2018-02-26 11:52:17,247 [INFO] IRT.run_mlp: epoch 26 training loss (over all batches) 40.6816 
+2018-02-26 11:52:26,531 [INFO] IRT.run_mlp: epoch 27 training loss (over all batches) 39.9256 
+2018-02-26 11:52:35,821 [INFO] IRT.run_mlp: epoch 28 training loss (over all batches) 39.3790 
+2018-02-26 11:52:45,103 [INFO] IRT.run_mlp: epoch 29 training loss (over all batches) 38.8847 
+2018-02-26 11:52:54,409 [INFO] IRT.run_mlp: epoch 30 training loss (over all batches) 38.4245 
+2018-02-26 11:52:54,427 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7184 auc 0.7521 
+2018-02-26 11:53:03,725 [INFO] IRT.run_mlp: epoch 31 training loss (over all batches) 37.8316 
+2018-02-26 11:53:13,050 [INFO] IRT.run_mlp: epoch 32 training loss (over all batches) 37.2809 
+2018-02-26 11:53:22,354 [INFO] IRT.run_mlp: epoch 33 training loss (over all batches) 37.0308 
+2018-02-26 11:53:31,617 [INFO] IRT.run_mlp: epoch 34 training loss (over all batches) 36.9607 
+2018-02-26 11:53:40,926 [INFO] IRT.run_mlp: epoch 35 training loss (over all batches) 36.3664 
+2018-02-26 11:53:50,207 [INFO] IRT.run_mlp: epoch 36 training loss (over all batches) 36.4332 
+2018-02-26 11:53:59,522 [INFO] IRT.run_mlp: epoch 37 training loss (over all batches) 35.7522 
+2018-02-26 11:54:08,806 [INFO] IRT.run_mlp: epoch 38 training loss (over all batches) 35.4792 
+2018-02-26 11:54:18,148 [INFO] IRT.run_mlp: epoch 39 training loss (over all batches) 35.2418 
+2018-02-26 11:54:27,473 [INFO] IRT.run_mlp: epoch 40 training loss (over all batches) 35.1653 
+2018-02-26 11:54:27,490 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7219 auc 0.7541 
+2018-02-26 11:54:36,769 [INFO] IRT.run_mlp: epoch 41 training loss (over all batches) 35.0197 
+2018-02-26 11:54:46,106 [INFO] IRT.run_mlp: epoch 42 training loss (over all batches) 34.3172 
+2018-02-26 11:54:55,406 [INFO] IRT.run_mlp: epoch 43 training loss (over all batches) 34.6796 
+2018-02-26 11:55:04,718 [INFO] IRT.run_mlp: epoch 44 training loss (over all batches) 34.2425 
+2018-02-26 11:55:14,003 [INFO] IRT.run_mlp: epoch 45 training loss (over all batches) 34.0197 
+2018-02-26 11:55:23,368 [INFO] IRT.run_mlp: epoch 46 training loss (over all batches) 33.7417 
+2018-02-26 11:55:32,104 [INFO] IRT.run_mlp: epoch 47 training loss (over all batches) 34.0068 
+2018-02-26 11:55:41,406 [INFO] IRT.run_mlp: epoch 48 training loss (over all batches) 33.0948 
+2018-02-26 11:55:50,705 [INFO] IRT.run_mlp: epoch 49 training loss (over all batches) 33.7812 
+2018-02-26 11:55:50,712 [INFO] IRT.run_mlp: Appending this fold prediction to data/Assistant/prediction/skill_builder_data.csv, number of interactions 69348
+2018-02-26 11:55:50,930 [INFO] IRT.run_mlp: Fold 3: Num Interactions: 69348; Test Accuracy: 0.72190; Test AUC: 0.75407
+2018-02-26 11:55:50,973 [INFO] IRT.run_mlp: this fold has 69348 interactions and students 3732
+2018-02-26 11:55:50,973 [INFO] IRT.run_mlp: Beginning fold 4
+2018-02-26 11:55:50,973 [INFO] IRT.run_mlp: Training RNN, fold 4, train length 277392, test length 69348
+2018-02-26 11:55:50,973 [INFO] IRT.run_mlp: num_questions=26684? 26684 num_users=4097? 4097
+2018-02-26 11:55:51,063 [INFO] IRT.run_mlp: Building model: embedding size 200 hidden dimension 50
+2018-02-26 11:55:51,389 [INFO] IRT.run_mlp: NCF input_dim=2*emb_size+1(timestamp) 401 hidden_num 50 output_dim 2
+2018-02-26 11:55:51,389 [INFO] IRT.run_mlp: Model optimizer first learning rate is 0.001
+2018-02-26 11:55:51,395 [INFO] IRT.run_mlp: Cuda detected, using cuda
+2018-02-26 11:55:51,395 [INFO] IRT.run_mlp: Prediction output path data/Assistant/prediction/skill_builder_data.csv (removing existing one)!
+2018-02-26 11:55:51,395 [INFO] IRT.run_mlp: Number of iterations for this fold 50
+2018-02-26 11:55:51,395 [INFO] IRT.run_mlp: self.test_data_y.shape (69348, 2)
+2018-02-26 11:56:00,644 [INFO] IRT.run_mlp: epoch 0 training loss (over all batches) 456.3729 
+2018-02-26 11:56:09,932 [INFO] IRT.run_mlp: epoch 1 training loss (over all batches) 388.4715 
+2018-02-26 11:56:19,221 [INFO] IRT.run_mlp: epoch 2 training loss (over all batches) 350.7977 
+2018-02-26 11:56:28,532 [INFO] IRT.run_mlp: epoch 3 training loss (over all batches) 324.1799 
+2018-02-26 11:56:37,803 [INFO] IRT.run_mlp: epoch 4 training loss (over all batches) 294.2828 
+2018-02-26 11:56:47,097 [INFO] IRT.run_mlp: epoch 5 training loss (over all batches) 258.2484 
+2018-02-26 11:56:56,441 [INFO] IRT.run_mlp: epoch 6 training loss (over all batches) 219.2037 
+2018-02-26 11:57:05,764 [INFO] IRT.run_mlp: epoch 7 training loss (over all batches) 182.5553 
+2018-02-26 11:57:15,050 [INFO] IRT.run_mlp: epoch 8 training loss (over all batches) 151.2858 
+2018-02-26 11:57:24,330 [INFO] IRT.run_mlp: epoch 9 training loss (over all batches) 125.3741 
+2018-02-26 11:57:33,655 [INFO] IRT.run_mlp: epoch 10 training loss (over all batches) 105.9056 
+2018-02-26 11:57:33,674 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7115 auc 0.7468 
+2018-02-26 11:57:42,961 [INFO] IRT.run_mlp: epoch 11 training loss (over all batches) 91.0149 
+2018-02-26 11:57:52,274 [INFO] IRT.run_mlp: epoch 12 training loss (over all batches) 80.1862 
+2018-02-26 11:58:01,574 [INFO] IRT.run_mlp: epoch 13 training loss (over all batches) 71.7605 
+2018-02-26 11:58:10,895 [INFO] IRT.run_mlp: epoch 14 training loss (over all batches) 65.2178 
+2018-02-26 11:58:20,172 [INFO] IRT.run_mlp: epoch 15 training loss (over all batches) 60.2511 
+2018-02-26 11:58:29,466 [INFO] IRT.run_mlp: epoch 16 training loss (over all batches) 56.6948 
+2018-02-26 11:58:38,804 [INFO] IRT.run_mlp: epoch 17 training loss (over all batches) 53.4783 
+2018-02-26 11:58:48,063 [INFO] IRT.run_mlp: epoch 18 training loss (over all batches) 50.8163 
+2018-02-26 11:58:57,385 [INFO] IRT.run_mlp: epoch 19 training loss (over all batches) 49.1940 
+2018-02-26 11:59:06,688 [INFO] IRT.run_mlp: epoch 20 training loss (over all batches) 47.2218 
+2018-02-26 11:59:06,706 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7208 auc 0.7526 
+2018-02-26 11:59:16,008 [INFO] IRT.run_mlp: epoch 21 training loss (over all batches) 46.0996 
+2018-02-26 11:59:25,279 [INFO] IRT.run_mlp: epoch 22 training loss (over all batches) 44.6839 
+2018-02-26 11:59:34,622 [INFO] IRT.run_mlp: epoch 23 training loss (over all batches) 43.3805 
+2018-02-26 11:59:43,909 [INFO] IRT.run_mlp: epoch 24 training loss (over all batches) 42.6232 
+2018-02-26 11:59:53,173 [INFO] IRT.run_mlp: epoch 25 training loss (over all batches) 41.2603 
+2018-02-26 12:00:02,502 [INFO] IRT.run_mlp: epoch 26 training loss (over all batches) 41.2935 
+2018-02-26 12:00:11,770 [INFO] IRT.run_mlp: epoch 27 training loss (over all batches) 40.7747 
+2018-02-26 12:00:21,094 [INFO] IRT.run_mlp: epoch 28 training loss (over all batches) 40.1169 
+2018-02-26 12:00:30,368 [INFO] IRT.run_mlp: epoch 29 training loss (over all batches) 39.5537 
+2018-02-26 12:00:39,690 [INFO] IRT.run_mlp: epoch 30 training loss (over all batches) 38.8628 
+2018-02-26 12:00:39,707 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7240 auc 0.7515 
+2018-02-26 12:00:48,978 [INFO] IRT.run_mlp: epoch 31 training loss (over all batches) 38.2884 
+2018-02-26 12:00:58,282 [INFO] IRT.run_mlp: epoch 32 training loss (over all batches) 38.0900 
+2018-02-26 12:01:07,592 [INFO] IRT.run_mlp: epoch 33 training loss (over all batches) 37.5503 
+2018-02-26 12:01:16,893 [INFO] IRT.run_mlp: epoch 34 training loss (over all batches) 37.0923 
+2018-02-26 12:01:26,243 [INFO] IRT.run_mlp: epoch 35 training loss (over all batches) 36.7619 
+2018-02-26 12:01:35,529 [INFO] IRT.run_mlp: epoch 36 training loss (over all batches) 36.7901 
+2018-02-26 12:01:44,840 [INFO] IRT.run_mlp: epoch 37 training loss (over all batches) 36.2321 
+2018-02-26 12:01:54,105 [INFO] IRT.run_mlp: epoch 38 training loss (over all batches) 36.1114 
+2018-02-26 12:02:03,420 [INFO] IRT.run_mlp: epoch 39 training loss (over all batches) 36.1616 
+2018-02-26 12:02:12,723 [INFO] IRT.run_mlp: epoch 40 training loss (over all batches) 35.7402 
+2018-02-26 12:02:12,740 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7260 auc 0.7500 
+2018-02-26 12:02:22,014 [INFO] IRT.run_mlp: epoch 41 training loss (over all batches) 35.9135 
+2018-02-26 12:02:31,313 [INFO] IRT.run_mlp: epoch 42 training loss (over all batches) 34.8792 
+2018-02-26 12:02:40,601 [INFO] IRT.run_mlp: epoch 43 training loss (over all batches) 35.4736 
+2018-02-26 12:02:49,951 [INFO] IRT.run_mlp: epoch 44 training loss (over all batches) 34.8656 
+2018-02-26 12:02:59,246 [INFO] IRT.run_mlp: epoch 45 training loss (over all batches) 34.7402 
+2018-02-26 12:03:08,553 [INFO] IRT.run_mlp: epoch 46 training loss (over all batches) 34.7939 
+2018-02-26 12:03:17,270 [INFO] IRT.run_mlp: epoch 47 training loss (over all batches) 34.4792 
+2018-02-26 12:03:26,588 [INFO] IRT.run_mlp: epoch 48 training loss (over all batches) 34.0449 
+2018-02-26 12:03:35,863 [INFO] IRT.run_mlp: epoch 49 training loss (over all batches) 34.3922 
+2018-02-26 12:03:35,869 [INFO] IRT.run_mlp: Appending this fold prediction to data/Assistant/prediction/skill_builder_data.csv, number of interactions 69348
+2018-02-26 12:03:36,089 [INFO] IRT.run_mlp: Fold 4: Num Interactions: 69348; Test Accuracy: 0.72605; Test AUC: 0.75001
+2018-02-26 12:03:36,132 [INFO] IRT.run_mlp: this fold has 69348 interactions and students 3731
+2018-02-26 12:03:36,132 [INFO] IRT.run_mlp: Beginning fold 5
+2018-02-26 12:03:36,132 [INFO] IRT.run_mlp: Training RNN, fold 5, train length 277392, test length 69348
+2018-02-26 12:03:36,132 [INFO] IRT.run_mlp: num_questions=26684? 26684 num_users=4097? 4097
+2018-02-26 12:03:36,226 [INFO] IRT.run_mlp: Building model: embedding size 200 hidden dimension 50
+2018-02-26 12:03:36,551 [INFO] IRT.run_mlp: NCF input_dim=2*emb_size+1(timestamp) 401 hidden_num 50 output_dim 2
+2018-02-26 12:03:36,551 [INFO] IRT.run_mlp: Model optimizer first learning rate is 0.001
+2018-02-26 12:03:36,556 [INFO] IRT.run_mlp: Cuda detected, using cuda
+2018-02-26 12:03:36,556 [INFO] IRT.run_mlp: Prediction output path data/Assistant/prediction/skill_builder_data.csv (removing existing one)!
+2018-02-26 12:03:36,556 [INFO] IRT.run_mlp: Number of iterations for this fold 50
+2018-02-26 12:03:36,556 [INFO] IRT.run_mlp: self.test_data_y.shape (69348, 2)
+2018-02-26 12:03:45,829 [INFO] IRT.run_mlp: epoch 0 training loss (over all batches) 458.2482 
+2018-02-26 12:03:55,178 [INFO] IRT.run_mlp: epoch 1 training loss (over all batches) 389.9604 
+2018-02-26 12:04:04,471 [INFO] IRT.run_mlp: epoch 2 training loss (over all batches) 351.3494 
+2018-02-26 12:04:13,771 [INFO] IRT.run_mlp: epoch 3 training loss (over all batches) 323.8871 
+2018-02-26 12:04:23,036 [INFO] IRT.run_mlp: epoch 4 training loss (over all batches) 293.7321 
+2018-02-26 12:04:32,347 [INFO] IRT.run_mlp: epoch 5 training loss (over all batches) 257.9575 
+2018-02-26 12:04:41,618 [INFO] IRT.run_mlp: epoch 6 training loss (over all batches) 219.6471 
+2018-02-26 12:04:50,889 [INFO] IRT.run_mlp: epoch 7 training loss (over all batches) 182.5423 
+2018-02-26 12:05:00,198 [INFO] IRT.run_mlp: epoch 8 training loss (over all batches) 151.5294 
+2018-02-26 12:05:09,496 [INFO] IRT.run_mlp: epoch 9 training loss (over all batches) 126.2177 
+2018-02-26 12:05:18,819 [INFO] IRT.run_mlp: epoch 10 training loss (over all batches) 105.9247 
+2018-02-26 12:05:18,837 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7098 auc 0.7467 
+2018-02-26 12:05:28,156 [INFO] IRT.run_mlp: epoch 11 training loss (over all batches) 91.0561 
+2018-02-26 12:05:37,549 [INFO] IRT.run_mlp: epoch 12 training loss (over all batches) 80.2883 
+2018-02-26 12:05:46,822 [INFO] IRT.run_mlp: epoch 13 training loss (over all batches) 71.7840 
+2018-02-26 12:05:56,149 [INFO] IRT.run_mlp: epoch 14 training loss (over all batches) 65.5297 
+2018-02-26 12:06:05,455 [INFO] IRT.run_mlp: epoch 15 training loss (over all batches) 60.9441 
+2018-02-26 12:06:14,753 [INFO] IRT.run_mlp: epoch 16 training loss (over all batches) 56.9165 
+2018-02-26 12:06:24,101 [INFO] IRT.run_mlp: epoch 17 training loss (over all batches) 54.1224 
+2018-02-26 12:06:33,389 [INFO] IRT.run_mlp: epoch 18 training loss (over all batches) 51.6114 
+2018-02-26 12:06:42,719 [INFO] IRT.run_mlp: epoch 19 training loss (over all batches) 49.8907 
+2018-02-26 12:06:52,033 [INFO] IRT.run_mlp: epoch 20 training loss (over all batches) 48.1058 
+2018-02-26 12:06:52,052 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7141 auc 0.7488 
+2018-02-26 12:07:01,334 [INFO] IRT.run_mlp: epoch 21 training loss (over all batches) 45.9575 
+2018-02-26 12:07:10,605 [INFO] IRT.run_mlp: epoch 22 training loss (over all batches) 45.2334 
+2018-02-26 12:07:19,886 [INFO] IRT.run_mlp: epoch 23 training loss (over all batches) 44.0366 
+2018-02-26 12:07:29,198 [INFO] IRT.run_mlp: epoch 24 training loss (over all batches) 42.8145 
+2018-02-26 12:07:38,459 [INFO] IRT.run_mlp: epoch 25 training loss (over all batches) 42.6779 
+2018-02-26 12:07:47,808 [INFO] IRT.run_mlp: epoch 26 training loss (over all batches) 41.6030 
+2018-02-26 12:07:57,096 [INFO] IRT.run_mlp: epoch 27 training loss (over all batches) 40.9569 
+2018-02-26 12:08:06,447 [INFO] IRT.run_mlp: epoch 28 training loss (over all batches) 40.2520 
+2018-02-26 12:08:15,747 [INFO] IRT.run_mlp: epoch 29 training loss (over all batches) 40.0929 
+2018-02-26 12:08:25,074 [INFO] IRT.run_mlp: epoch 30 training loss (over all batches) 39.5463 
+2018-02-26 12:08:25,094 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7187 auc 0.7521 
+2018-02-26 12:08:34,378 [INFO] IRT.run_mlp: epoch 31 training loss (over all batches) 38.7846 
+2018-02-26 12:08:43,662 [INFO] IRT.run_mlp: epoch 32 training loss (over all batches) 38.7970 
+2018-02-26 12:08:52,987 [INFO] IRT.run_mlp: epoch 33 training loss (over all batches) 38.0035 
+2018-02-26 12:09:02,254 [INFO] IRT.run_mlp: epoch 34 training loss (over all batches) 37.5599 
+2018-02-26 12:09:11,566 [INFO] IRT.run_mlp: epoch 35 training loss (over all batches) 37.4841 
+2018-02-26 12:09:20,836 [INFO] IRT.run_mlp: epoch 36 training loss (over all batches) 37.0945 
+2018-02-26 12:09:30,165 [INFO] IRT.run_mlp: epoch 37 training loss (over all batches) 37.0247 
+2018-02-26 12:09:39,436 [INFO] IRT.run_mlp: epoch 38 training loss (over all batches) 36.6428 
+2018-02-26 12:09:48,754 [INFO] IRT.run_mlp: epoch 39 training loss (over all batches) 36.5680 
+2018-02-26 12:09:58,045 [INFO] IRT.run_mlp: epoch 40 training loss (over all batches) 36.4051 
+2018-02-26 12:09:58,063 [INFO] IRT.run_mlp: testing every 10 accuracy 0.7223 auc 0.7530 
+2018-02-26 12:10:07,334 [INFO] IRT.run_mlp: epoch 41 training loss (over all batches) 36.1417 
+2018-02-26 12:10:16,634 [INFO] IRT.run_mlp: epoch 42 training loss (over all batches) 35.8978 
+2018-02-26 12:10:25,947 [INFO] IRT.run_mlp: epoch 43 training loss (over all batches) 35.6600 
+2018-02-26 12:10:35,256 [INFO] IRT.run_mlp: epoch 44 training loss (over all batches) 35.3594 
+2018-02-26 12:10:44,552 [INFO] IRT.run_mlp: epoch 45 training loss (over all batches) 35.0258 
+2018-02-26 12:10:53,863 [INFO] IRT.run_mlp: epoch 46 training loss (over all batches) 35.0659 
+2018-02-26 12:10:59,716 [INFO] IRT.run_mlp: epoch 47 training loss (over all batches) 34.5907 
+2018-02-26 12:11:04,649 [INFO] IRT.run_mlp: epoch 48 training loss (over all batches) 34.6739 
+2018-02-26 12:11:09,581 [INFO] IRT.run_mlp: epoch 49 training loss (over all batches) 34.5724 
+2018-02-26 12:11:09,587 [INFO] IRT.run_mlp: Appending this fold prediction to data/Assistant/prediction/skill_builder_data.csv, number of interactions 69348
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Fold 5: Num Interactions: 69348; Test Accuracy: 0.72233; Test AUC: 0.75296
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Completed all 5 folds
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Fold 1 Acc: 0.72045 AUC: 0.75007
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Fold 2 Acc: 0.72371 AUC: 0.75133
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Fold 3 Acc: 0.72190 AUC: 0.75407
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Fold 4 Acc: 0.72605 AUC: 0.75001
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Fold 5 Acc: 0.72233 AUC: 0.75296
+2018-02-26 12:11:09,802 [INFO] IRT.run_mlp: Overall 5 Acc: 0.72289 AUC: 0.75169
