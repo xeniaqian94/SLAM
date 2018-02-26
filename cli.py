@@ -2,7 +2,7 @@ from __future__ import division
 
 import click
 import numpy as np
-
+import os
 from cliutils import (CommonOptionGroup, ensure_directory_callback, logging_callback,
                       valid_which_fold, require_value_callback)
 from IRT import run_mlp
@@ -172,13 +172,12 @@ def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_
                          max_interactions_per_user=common.max_inter,
                          min_interactions_per_user=common.min_inter,
                          proportion_students_retained=common.proportion_students_retained, meta=False,
-                         prediction_output=prediction_output+data_file.split("/")[-1])
+                         prediction_output=prediction_output + data_file.split("/")[-1])
+
+    if os.path.exists(data_opts.prediction_output):
+        os.remove(data_opts.prediction_output)
 
     data, user_ids, item_ids, _, _ = load_data(data_file, source, data_opts)
-    # input("user ids "+str(user_ids)+" "+str(max(user_ids)))
-    # input("item ids "+str(item_ids)+" "+str(max(item_ids)))
-
-    # normalize_by_columns
 
     num_questions = len(item_ids)
     data_folds = split_data(data, num_folds=common.num_folds, seed=common.seed, by_interaction=True)

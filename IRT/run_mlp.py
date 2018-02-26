@@ -225,8 +225,6 @@ class ModelExecuter:
         self.prediction_output = None
         if data_opts.prediction_output != None:
             self.prediction_output = data_opts.prediction_output
-            if os.path.exists(data_opts.prediction_output):
-                os.remove(data_opts.prediction_output)
             LOGGER.info("Prediction output path " + self.prediction_output + " (removing existing one)!")
 
     def train_and_test(self, num_iters, test_spacing=5):
@@ -246,7 +244,7 @@ class ModelExecuter:
         LOGGER.info("self.test_data_y.shape " + str(self.test_data_y.shape))
 
         for epoch in np.arange(num_iters):
-            LOGGER.info("Epoch " + str(epoch) + " starts! ")
+            # LOGGER.info("Epoch " + str(epoch) + " starts! ")
             self.train_data_X, self.train_data_y = unison_shuffled_copies(self.train_data_X, self.train_data_y)
 
             # training
