@@ -28,15 +28,17 @@ A `.csv` dump of cross-validated prediction is located at `data/Assistant/predic
  
 ### On Duolingo dataset:
 
-To train a Logistic Regression baseline and predict:
+To train a (official release baseline) Logistic Regression and predict:
+
+	cd starter_code/
 	
 	python baseline.py --train ../data/data_es_en/es_en.slam.20171218.train --test ../data/data_es_en/es_en.slam.20171218.dev --pred prediction_es_en/es_en.slam.20171218.pred 
 
-To evaluate:
+Then to evaluate:
 	
 	python eval.py --pred prediction_es_en/es_en.slam.20171218.pred --key ../data/data_es_en/es_en.slam.20171218.dev.key
 
-Output:
+You will see an output:
 	
 	Metrics:	accuracy=0.848	avglogloss=0.378	auroc=0.752	F1=0.176
  
