@@ -3,15 +3,19 @@
 
 ## Dataset
 
-You might want to load raw data/ directory (gitignored, requires local downloads).
+You need to download raw data and organize them in this hierarchy. (currently partially gitignored).
 
 	|-data/
    		|-data_en_es/
    		|-data_es_en/
-   		|-data_fr_en
+   		|-data_fr_en/
    		|-Assistant/
+			|-skill_builder_data_corrected.csv
+			|-skill_builder_data.csv
 
-We use a deduplicated version of `skill_builder_data_corrected.csv` from Skill-builder data 2009-2010 https://sites.google.com/site/assistmentsdata/home/assistment-2009-2010-data/skill-builder-data-2009-2010
+`data_en_es/` and 2 others can be download from [http://sharedtask.duolingo.com](http://sharedtask.duolingo.com)
+
+We use a deduplicated version of `skill_builder_data_corrected.csv`, named as `skill_builder_data_corrected.csv` from [Skill-builder data 2009-2010](https://sites.google.com/site/assistmentsdata/home/assistment-2009-2010-data/skill-builder-data-2009-2010)
 
 
 ## Command
