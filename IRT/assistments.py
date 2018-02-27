@@ -142,6 +142,8 @@ def load_data(file_path, item_id_col=SKILL_ID_KEY, template_id_col=None, concept
             TIME_IDX_KEY].std()  # we are always able to eoncode time
         cols_to_keep += [USER_ID_KEY, item_id_col, ORDER_ID]
 
+    # input(cols_to_keep)
+
         # encode user_id and item_id as 0-N
 
     # input("X columns" + str(cols_to_keep))
