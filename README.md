@@ -47,4 +47,7 @@ Then to evaluate:
 You will see an output:
 	
 	Metrics:	accuracy=0.848	avglogloss=0.378	auroc=0.752	F1=0.176
- 
+
+
+### Under the duolingo_submission_0319 branch:
+Our submission attempt to the shared task 
