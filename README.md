@@ -40,6 +40,11 @@ To train a (official release baseline) Logistic Regression and predict:
 	
 	python baseline.py --train ../data/data_es_en/es_en.slam.20171218.train --test ../data/data_es_en/es_en.slam.20171218.dev --pred prediction_es_en/es_en.slam.20171218.pred 
 
+The output will show the total training and dev instances for English -> Spanish are,
+
+    loading 1973558 instances across 731896 exercises.
+    loading 288864 instances across 96003 exercises.
+    
 Then to evaluate:
 	
 	python eval.py --pred prediction_es_en/es_en.slam.20171218.pred --key ../data/data_es_en/es_en.slam.20171218.dev.key
@@ -51,3 +56,7 @@ You will see an output:
 
 ### Under the duolingo_submission_0319 branch:
 Our submission attempt to the shared task 
+
+TODO:
+1. organize data in csv format, just as assistments.csv 
+2. 
