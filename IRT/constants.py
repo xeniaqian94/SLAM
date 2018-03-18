@@ -45,3 +45,5 @@ SKILL_ID_KEY = 'skill_id'
 PROBLEM_ID_KEY = 'problem_id'
 TEMPLATE_ID_KEY = 'template_id'
 USER_ID_KEY = 'user_id'
+
+INSTANCE_ID_KEY='instance_id'

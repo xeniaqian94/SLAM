@@ -6,10 +6,11 @@ import os
 from cliutils import (CommonOptionGroup, ensure_directory_callback, logging_callback,
                       valid_which_fold, require_value_callback)
 from IRT import run_mlp
-from IRT.constants import USER_IDX_KEY, SINGLE
+from IRT.constants import USER_IDX_KEY, SINGLE, INSTANCE_ID_KEY
 # from IRT.split_data import split_data
 from IRT.splitting_utils import split_data
 from IRT.wrapper import load_data, DataOpts
+from starter_code.duolingo_data2csv import create_csv
 
 SKILL_ID_KEY = 'skill_id'
 PROBLEM_ID_KEY = 'problem_id'
@@ -46,7 +47,7 @@ common_options.add('--item-id-col', type=str, nargs=1,
                    help="(Required) Which column should be used for identifying items from the "
                         "dataset. Depends on source as to which names are valid.",
                    extra_callback=require_value_callback((SKILL_ID_KEY, PROBLEM_ID_KEY,
-                                                          TEMPLATE_ID_KEY, SINGLE)))
+                                                          TEMPLATE_ID_KEY, SINGLE, INSTANCE_ID_KEY)))
 common_options.add('--drop-duplicates/--no-drop-duplicates', default=True,
                    help="Remove duplicate interactions: only the first row is retained for "
                         "duplicate row indices in Assistments")
@@ -188,6 +189,81 @@ def ncf(common, source, data_file, hidden_dim, embedding_dim, test_spacing, use_
                 first_learning_rate=first_learning_rate,
                 which_fold=common.which_fold, num_users=len(user_ids), user_ids=user_ids, item_ids=item_ids,
                 embedding_dim=embedding_dim)
+
+
+@cli.command('bilstm')
+@click.argument('source')  # duolingo
+@click.argument('train_file')  # data/data_es_en/es_en.slam.20171218.train.csv
+@click.argument('test_file')  # data/data_es_en/es_en.slam.20171218.dev.csv  # or data/data_es_en/test.es_en.csv
+
+# @click.option('--hidden-dim', '-h', type=int, nargs=1, default=100,
+#               help="The number of hidden units in the RNN.")
+# @click.option('--embedding_dim', '-h', type=int, nargs=1, default=200,
+#               help="Dimension of embeddings units in the MLP.")
+# @click.option('--test-spacing', '-t', type=int, nargs=1, default=10,
+#               help="How many iterations before running the tests?")
+# @click.option('--use-correct/--no-use-correct', default=True,
+#               help="If True, record correct and incorrect responses as different input dimensions")
+# @click.option('--num-iters', '-n', type=int, default=50,
+#               help="How many iterations of training to perform on the RNN")
+# # @click.option('--dropout-prob', '-p', type=float, default=0.0,
+# #               help="The probability of a node being dropped during training. Default is 0.0 "
+# #                    "(i.e., no dropout)")
+# @click.option('--use-hints/--no-use-hints', default=False,
+#               help="Should we add a one-hot dimension to represent whether a student used a hint?")
+# @click.option('--first-learning-rate', nargs=1, default=0.001, type=float,
+#               help="The initial learning rate. Will decay at rate `decay_rate`. Default is 30.0.")
+# @click.option('--prediction_output', default="data/Assistant/prediction/", type=str,
+#               help="where output csv goes")
+@common_options
+def bilstm(common, source, train_file, test_file):
+    # , hidden_dim, embedding_dim, test_spacing, use_correct, num_iters,
+    #        use_hints,
+    #        first_learning_rate, prediction_output):
+    """
+    MLP based correctness prediction
+    """
+
+    print(source)
+
+    print(train_file)
+    print("/".join(train_file.split("/")[:-1]))
+    print(os.listdir("/".join(train_file.split("/")[:-1])))
+    print(os.path.exists(train_file))
+    if not os.path.exists(train_file):
+        create_csv(train_file.replace(".csv",""))
+    print(len(open(train_file).readlines()))
+
+    print(test_file)
+    if not os.path.exists(test_file):
+        create_csv(test_file.replace(".csv",""))
+    print(len(open(test_file).readlines()))
+
+
+    # data_opts = DataOpts(num_folds=common.num_folds, item_id_col=common.item_id_col,
+    #                      concept_id_col=None, template_id_col=None, use_correct=use_correct,
+    #                      remove_skill_nans=common.remove_skill_nans, seed=common.seed,
+    #                      use_hints=use_hints,
+    #                      drop_duplicates=common.drop_duplicates,
+    #                      max_interactions_per_user=common.max_inter,
+    #                      min_interactions_per_user=common.min_inter,
+    #                      proportion_students_retained=common.proportion_students_retained, meta=False,
+    #                      prediction_output=prediction_output + data_file.split("/")[-1])
+    #
+    # if os.path.exists(data_opts.prediction_output):
+    #     os.remove(data_opts.prediction_output)
+    # # input(data_opts)
+    # data, user_ids, item_ids, _, _ = load_data(data_file, source, data_opts)
+    #
+    # num_questions = len(item_ids)
+    # data_folds = split_data(data, num_folds=common.num_folds, seed=common.seed, by_interaction=True)
+    #
+    # run_mlp.run(data_folds, common.num_folds, num_questions, num_iters,
+    #             hidden_dim=hidden_dim, test_spacing=test_spacing,
+    #             data_opts=data_opts,
+    #             first_learning_rate=first_learning_rate,
+    #             which_fold=common.which_fold, num_users=len(user_ids), user_ids=user_ids, item_ids=item_ids,
+    #             embedding_dim=embedding_dim)
 
 
 @cli.command('mlp')

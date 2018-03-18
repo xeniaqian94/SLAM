@@ -356,10 +356,10 @@ for epoch in range(
         neg_log_likelihood.backward()
         optimizer.step()
 
-        # print("After optimized in epoch " + str(epoch))
+        print("After optimized in epoch " + str(epoch))
 
         precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)
-        # print(model(precheck_sent))
+        print(model(precheck_sent))
 
 # Check predictions after training
 precheck_sent = prepare_sequence(training_data[0][0], word_to_ix)

@@ -34,6 +34,10 @@ You could also run a naive MLP with pre-defined features (e.g. ms_response, atte
      
 ### On Duolingo dataset:
 
+To train a bi-LSTM without CRF for contextual aware tagging:
+    
+    python cli.py bilstm duolingo data/data_es_en/es_en.slam.20171218.train.csv data/data_es_en/es_en.slam.20171218.dev --item-id-col instance_id
+    
 To train a (official release baseline) Logistic Regression and predict:
 
 	cd starter_code/
@@ -52,6 +56,8 @@ Then to evaluate:
 You will see an output:
 	
 	Metrics:	accuracy=0.848	avglogloss=0.378	auroc=0.752	F1=0.176
+	
+
 
 
 ### Under the duolingo_submission_0319 branch:
