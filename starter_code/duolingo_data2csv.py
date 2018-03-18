@@ -38,7 +38,6 @@ def create_csv(input_path):
                     value = value.split('|')[0]  # select the very first country that the user specified
 #                     if (len(value)>1):
 #                         print("This user has more than one country "+line)
-                
                 elif key == 'days':
                     value = float(value)
                 elif key == 'client':
@@ -80,7 +79,7 @@ def create_csv(input_path):
                     value = int(value)
                 instance_properties['morphological_features_'+key]=value
                 
-            # TODO ends from pandas though ß
+            # TODO ends from pandas though
 
             instance_properties['dependency_label'] = line[4]
             instance_properties['dependency_edge_head'] = int(line[5])
